@@ -113,7 +113,7 @@ Un système complet de gestion de tickets développé avec **Spring Boot** (back
 
 ### 1. Cloner le dépôt
 ```bash
-git clone <repository-url>
+git clone https://github.com/saidabdeldjalile/issue-tracker-air.git
 cd IssueTracker-main
 ```
 
@@ -444,51 +444,13 @@ VITE_API_URL=http://localhost:6969
 ```
 IssueTracker-main/
 ├── src/                          # Backend Java/Spring Boot
-│   ├── main/
-│   │   ├── java/com/suryakn/IssueTracker/
-│   │   │   ├── auth/            # Authentification JWT
-│   │   │   ├── config/          # Configuration (Security, JWT, etc.)
-│   │   │   ├── controller/      # Contrôleurs REST API
-│   │   │   ├── dto/             # Data Transfer Objects
-│   │   │   ├── entity/          # Entités JPA
-│   │   │   ├── repository/      # Repositories Spring Data
-│   │   │   └── service/         # Services métier
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── static/
-│   └── test/                    # Tests unitaires
-├── issue-tracker-web/           # Frontend React/TypeScript
-│   ├── src/
-│   │   ├── api/                 # Configuration Axios
-│   │   ├── components/          # Composants React
-│   │   │   ├── dashboard/       # Composants du tableau de bord
-│   │   │   └── ticket/          # Composants des tickets
-│   │   ├── hooks/               # Custom hooks (useAuth, useNotification)
-│   │   ├── context/             # Context API (AuthProvider)
-│   │   ├── types/               # Types TypeScript
-│   │   └── *.tsx                # Pages principales
-│   ├── public/
-│   └── package.json
-├── ai-service/                  # Service Python IA (chatbot + classification)
-│   ├── app.py                   # Application Flask principale
-│   ├── actions_server.py       # Actions Rasa
-│   ├── train.py                 # Script d'entraînement Rasa
-│   ├── config.yml               # Configuration Rasa
-│   ├── domain.yml               # Définition du domaine Rasa
-│   ├── data/                    # Données d'entraînement Rasa
-│   │   ├── nlu.yml             # Données NLU
-│   │   ├── stories.yml         # Scénarios conversationnels
-│   │   └── rules.yml           # Règles conversationnelles
-│   ├── requirements.txt
-│   └── README.md               # Documentation du service IA
+├── issue-tracker-web/           # Frontend React/TypeScript (Vite)
+├── ai-service/                  # Service Rasa (Chatbot NLU + Actions)
+├── chatbot-service/             # Service complémentaire pour le Chatbot
+├── classification-service/      # Service IA de classification des tickets
 ├── duplicate-detection/         # Service Python de détection de doublons
-│   ├── dup.py                   # Application Flask
-│   ├── requirements.txt
-│   └── download_nltk.py
 ├── uploads/                     # Dossier d'upload des screenshots
-│   └── screenshots/
 ├── pom.xml                      # Configuration Maven
-├── application.properties       # Configuration Spring Boot
 ├── docker-compose.yml           # Configuration Docker
 ├── start-platform.sh            # Script de démarrage unifié
 └── README.md                    # Ce fichier
