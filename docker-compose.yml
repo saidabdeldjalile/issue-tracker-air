@@ -108,9 +108,6 @@ services:
        - OLLAMA_URL=http://host.docker.internal:11434
      volumes:
        - ./ai-service/models:/app/models
-     depends_on:
-       rasa-actions:
-         condition: service_started
      networks:
        - issue-tracker-network
      healthcheck:
@@ -121,25 +118,6 @@ services:
        start_period: 60s
      restart: unless-stopped
 
-  rasa-actions:
-    build:
-      context: ./ai-service
-      dockerfile: Dockerfile
-    container_name: rasa-actions
-    command: python -m rasa_sdk --actions actions_server --port 5055
-    ports:
-      - "5055:5055"
-    environment:
-      - ACTIONS_PORT=5055
-    networks:
-      - issue-tracker-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5055/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-      start_period: 20s
-    restart: unless-stopped
 
   duplicate-service:
     build:
