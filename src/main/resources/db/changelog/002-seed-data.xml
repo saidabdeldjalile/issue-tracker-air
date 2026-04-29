@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- ==================== SEED DEPARTMENTS ==================== -->
+    <changeSet id="001-seed-departments" author="liquibase">
+        <insert tableName="department">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="Informatique"/>
+            <column name="description" value="Département informatique et technologie"/>
+        </insert>
+        <insert tableName="department">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="Ressources Humaines"/>
+            <column name="description" value="Gestion des ressources humaines"/>
+        </insert>
+        <insert tableName="department">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="Finance"/>
+            <column name="description" value="Département financier et comptable"/>
+        </insert>
+    </changeSet>
+
+    <!-- ==================== SEED PROJECTS ==================== -->
+    <changeSet id="002-seed-projects" author="liquibase">
+        <insert tableName="project">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="Système de Paie"/>
+            <column name="department_id" valueNumeric="3"/>
+        </insert>
+        <insert tableName="project">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="Portail Employé"/>
+            <column name="department_id" valueNumeric="2"/>
+        </insert>
+        <insert tableName="project">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="Application Mobile"/>
+            <column name="department_id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+
+    <!-- ==================== SEED USERS ==================== -->
+    <changeSet id="003-seed-users" author="liquibase">
+        <!-- Admin user -->
+        <insert tableName="_user">
+            <column name="id" valueNumeric="1"/>
+            <column name="first_name" value="Admin"/>
+            <column name="last_name" value="System"/>
+            <column name="email" value="admin@airalgerie.dz"/>
+            <column name="password" value="$2a$10$N.zmdr9k7UOCG3bZHWeq.OG2H43q90QhK68GksM1FZs0K75dSXm.'
+"/>
+            <column name="role" value="ADMIN"/>
+            <column name="registration_number" value="ADMIN-001"/>
+            <column name="department_id" valueNumeric="1"/>
+        </insert>
+
+        <!-- Support users -->
+        <insert tableName="_user">
+            <column name="id" valueNumeric="2"/>
+            <column name="first_name" value="Support"/>
+            <column name="last_name" value="Technique"/>
+            <column name="email" value="support@airalgerie.dz"/>
+            <column name="password" value="$2a$10$N.zmdr9k7UOCG3bZHWeq.OG2H43q90QhK68GksM1FZs0K75dSXm.'
+"/>
+            <column name="role" value="SUPPORT"/>
+            <column name="registration_number" value="SUP-001"/>
+            <column name="department_id" valueNumeric="1"/>
+        </insert>
+
+        <insert tableName="_user">
+            <column name="id" valueNumeric="3"/>
+            <column name="first_name" value="Ahmed"/>
+            <column name="last_name" value="Benali"/>
+            <column name="email" value="ahmed.benali@airalgerie.dz"/>
+            <column name="password" value="$2a$10$N.zmdr9k7UOCG3bZHWeq.OG2H43q90QhK68GksM1FZs0K75dSXm.'
+"/>
+            <column name="role" value="SUPPORT"/>
+            <column name="registration_number" value="SUP-002"/>
+            <column name="department_id" valueNumeric="1"/>
+        </insert>
+
+        <!-- Regular users -->
+        <insert tableName="_user">
+            <column name="id" valueNumeric="4"/>
+            <column name="first_name" value="Fatima"/>
+            <column name="last_name" value="Zohra"/>
+            <column name="email" value="fatima.zohra@airalgerie.dz"/>
+            <column name="password" value="$2a$10$N.zmdr9k7UOCG3bZHWeq.OG2H43q90QhK68GksM1FZs0K75dSXm.'
+"/>
+            <column name="role" value="USER"/>
+            <column name="registration_number" value="USR-001"/>
+            <column name="department_id" valueNumeric="2"/>
+        </insert>
+
+        <insert tableName="_user">
+            <column name="id" valueNumeric="5"/>
+            <column name="first_name" value="Youcef"/>
+            <column name="last_name" value="Brahimi"/>
+            <column name="email" value="youcef.brahimi@airalgerie.dz"/>
+            <column name="password" value="$2a$10$N.zmdr9k7UOCG3bZHWeq.OG2H43q90QhK68GksM1FZs0K75dSXm.'
+"/>
+            <column name="role" value="USER"/>
+            <column name="registration_number" value="USR-002"/>
+            <column name="department_id" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+    <!-- ==================== SEED FAQ SAMPLE ==================== -->
+    <changeSet id="004-seed-faq" author="liquibase">
+        <insert tableName="faq">
+            <column name="id" valueNumeric="1"/>
+            <column name="question" value="Comment soumettre une demande d'absence ?"/>
+            <column name="answer" value="Rendez-vous sur le portail interne, section 'Congés', et remplissez le formulaire de demande d'absence. Votre manager recevra une notification pour approbation."/>
+            <column name="category" value="RH"/>
+            <column name="department_id" valueNumeric="2"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="view_count" valueNumeric="0"/>
+        </insert>
+        <insert tableName="faq">
+            <column name="id" valueNumeric="2"/>
+            <column name="question" value="Comment réinitialiser mon mot de passe ?"/>
+            <column name="answer" value="Cliquez sur 'Mot de passe oublié' sur la page de connexion. Un email de réinitialisation sera envoyé à votre adresse professionnelle."/>
+            <column name="category" value="Sécurité"/>
+            <column name="department_id" valueNumeric="1"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="view_count" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+
+    <!-- ==================== SEED FAQ KEYWORDS ==================== -->
+    <changeSet id="005-seed-faq-keywords" author="liquibase">
+        <insert tableName="faq_keywords">
+            <column name="faq_id" valueNumeric="1"/>
+            <column name="keywords" value="absence"/>
+        </insert>
+        <insert tableName="faq_keywords">
+            <column name="faq_id" valueNumeric="1"/>
+            <column name="keywords" value="congé"/>
+        </insert>
+        <insert tableName="faq_keywords">
+            <column name="faq_id" valueNumeric="1"/>
+            <column name="keywords" value="vacances"/>
+        </insert>
+        <insert tableName="faq_keywords">
+            <column name="faq_id" valueNumeric="2"/>
+            <column name="keywords" value="mot de passe"/>
+        </insert>
+        <insert tableName="faq_keywords">
+            <column name="faq_id" valueNumeric="2"/>
+            <column name="keywords" value="réinitialiser"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

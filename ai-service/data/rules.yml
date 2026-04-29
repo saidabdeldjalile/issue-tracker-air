@@ -1,0 +1,119 @@
+version: "3.1"
+
+rules:
+
+- rule: greet user
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- rule: say goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: bot challenge
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- rule: handle password help
+  steps:
+  - intent: get_password_help
+  - action: utter_password_help
+
+- rule: handle wifi help
+  steps:
+  - intent: get_wifi_help
+  - action: utter_wifi_help
+
+- rule: handle vpn help
+  steps:
+  - intent: get_vpn_help
+  - action: utter_vpn_help
+
+- rule: handle capabilities question
+  steps:
+  - intent: bot_capabilities
+  - action: utter_capabilities
+
+- rule: handle how are you
+  steps:
+  - intent: how_are_you
+  - action: utter_how_are_you
+
+- rule: handle urgent issues
+  steps:
+  - intent: urgent_issue
+  - action: utter_urgent_help
+  - action: action_create_ticket
+
+- rule: handle human request
+  steps:
+  - intent: ask_human
+  - action: utter_human_help
+
+- rule: app info question
+  steps:
+  - intent: get_app_info
+  - action: utter_app_info
+
+- rule: how to create ticket
+  steps:
+  - intent: how_to_create_ticket
+  - action: utter_how_to_create_ticket
+
+- rule: how to follow ticket
+  steps:
+  - intent: how_to_follow_ticket
+  - action: utter_how_to_follow_ticket
+
+- rule: what are categories
+  steps:
+  - intent: what_are_categories
+  - action: utter_what_are_categories
+
+- rule: what are statuses
+  steps:
+  - intent: what_are_statuses
+  - action: utter_what_are_statuses
+
+- rule: how to contact support
+  steps:
+  - intent: how_to_contact_support
+  - action: utter_how_to_contact_support
+
+- rule: how to modify profile
+  steps:
+  - intent: how_to_modify_profile
+  - action: utter_how_to_modify_profile
+
+- rule: how to upload screenshot
+  steps:
+  - intent: how_to_upload_screenshot
+  - action: utter_how_to_upload_screenshot
+
+- rule: what are priorities
+  steps:
+  - intent: what_are_priorities
+  - action: utter_what_are_priorities
+
+- rule: what is dashboard
+  steps:
+  - intent: what_is_dashboard
+  - action: utter_what_is_dashboard
+
+- rule: how to search ticket
+  steps:
+  - intent: how_to_search_ticket
+  - action: utter_how_to_search_ticket
+
+- rule: what are roles
+  steps:
+  - intent: what_are_roles
+  - action: utter_what_are_roles
+
+- rule: how to change theme
+  steps:
+  - intent: how_to_change_theme
+  - action: utter_how_to_change_theme

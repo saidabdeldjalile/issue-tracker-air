@@ -1,0 +1,402 @@
+version: "3.1"
+
+nlu:
+  - intent: greet
+    examples: |
+      bonjour
+      salam
+      hello
+      hi
+      bonsoir
+      coucou
+      bjr
+      salut
+      good morning
+      bonne journée
+      bonjour bonjour
+      salam alikoum
+      peace
+
+  - intent: goodbye
+    examples: |
+      au revoir
+      goodbye
+      à bientôt
+      à plus
+      je pars
+      bonne continuation
+
+  - intent: thanks
+    examples: |
+      merci
+      thank you
+      thanks
+      bravo
+      super
+      parfait
+      genial
+      excellent
+      merci beaucoup
+      je te remercie
+
+  - intent: create_ticket
+    examples: |
+      je veux créer un ticket
+      créer un ticket
+      nouvelle demande
+      j'ai un problème
+      je dois signaler un incident
+      je besoin d'aide
+      ouvrir un ticket
+      déclarer un incident
+      j'ai une requête
+
+  - intent: track_ticket
+    examples: |
+      suivre mon ticket
+      statut de mon ticket
+      où en est ma demande
+      état de mon ticket
+      numero de ticket
+      voir l'avancement
+      le suivi de ma demande
+
+  - intent: get_password_help
+    examples: |
+      mot de passe oublié
+      réinitialiser mot de passe
+      password perdu
+      changer mot de passe
+      mdp oublié
+      je n'arrive pas à me connecter
+      mot de passe incorrect
+      compte bloqué
+
+  - intent: get_wifi_help
+    examples: |
+      wifi ne fonctionne pas
+      problème internet
+      connexion wifi
+      pas d'internet
+      access wifi
+      mot de passe wifi
+      se connecter au wifi
+      réseau ne fonctionne pas
+
+  - intent: get_vpn_help
+    examples: |
+      vpn ne marche pas
+      accès vpn
+      accès distant
+      télétravai
+      travail à distance
+      connexion vpn
+      accéder à distance
+
+  - intent: get_hardware_request
+    examples: |
+      j'ai besoin d'un ordinateur
+      demander imprimante
+      nouvel écran
+      équipement informatique
+      souris ne fonctionne pas
+      clavier hs
+      écran cassé
+      remplacer matériel
+
+  - intent: get_leave_request
+    examples: |
+      demande de congé
+      prendre des vacances
+      absence prévue
+      posercongé
+      permission
+      jours de repos
+
+  - intent: get_equipment_issue
+    examples: |
+      mon pc ne démarre pas
+      ordinateur hs
+      imprimante bloquée
+      écran noir
+      bug ordinateur
+      pc lent
+      crash système
+
+  - intent: get_email_issue
+    examples: |
+      email ne marche pas
+      problème outlook
+      je reçois pas les mails
+      messagerie bloquée
+      impossible d'envoyer
+
+  - intent: get_building_issue
+    examples: |
+      climatisation ne marche pas
+      lumière grillée
+      porte bloquée
+      serrure cassée
+      wc bouché
+      fuite d'eau
+      problème ascenseur
+
+  - intent: how_are_you
+    examples: |
+      ça va
+      comment allez-vous
+      tu vas bien
+      everything fine
+      ca gaze
+
+  - intent: bot_capabilities
+    examples: |
+      que peux-tu faire
+      quelles sont tes capacités
+      comment peux-tu m'aider
+      aide moi
+      what can you do
+
+  - intent: affirm
+    examples: |
+      oui
+      ok
+      d'accord
+      parfaitement
+      exact
+      yes
+      ouais
+
+  - intent: deny
+    examples: |
+      non
+      pas maintenant
+      pas besoin
+      no
+      cancel
+
+  - intent: ask_human
+    examples: |
+      parler à un agent
+      je veux parler à quelqu'un
+      support humain
+      operator
+      humain
+
+  - intent: search_faq
+    examples: |
+      comment faire pour
+      où trouver
+      procedure
+      comment obtenir
+      guide
+      explication
+
+  - intent: urgent_issue
+    examples: |
+      urgent
+      très urgent
+      emergency
+      critical
+      bloquant
+      immédiatement
+      hors service
+      panne générale
+
+  - intent: general_question
+    examples: |
+      question
+      information
+      informer
+      details
+      explication
+
+  - intent: get_id_card
+    examples: |
+      carte d'embarquement
+      boarding pass
+      carte employee
+      badge ne fonctionne pas
+      accès badge
+      badge perdu
+      demande badge
+
+  - intent: get_salary_info
+    examples: |
+      bulletin de salaire
+      fiche de paie
+      salary
+      mes revenus
+      quand je reçois mon salaire
+      paie du mois
+      virement salaire
+
+  - intent: get_annual_leave
+    examples: |
+      droits aux congés
+      jours restants
+      mon reliquat
+      congés annuels
+      combien de jours
+      soldes congés
+      planning congés
+
+  - intent: get_training
+    examples: |
+      formation
+      cours
+      certification
+      compétences
+      apprendre
+      développer mes compétences
+      linkedin learning
+      e-learning
+      module formation
+      formation interne
+      formation externe
+
+  - intent: get_software_license
+    examples: |
+      license logicielle
+      installer office
+      adobe
+      autodesk
+      microsoft 365
+      access
+      Teams ne marche pas
+      Teams ne fonctionne pas
+      instaler un logiciel
+
+  - intent: get_printer_issue
+    examples: |
+      imprimante bloquée
+      papier coincé
+      toner vide
+      erreur imprimante
+      printer error
+      imprimante ne responds pas
+      impression ne marche pas
+
+  - intent: get_phone_issue
+    examples: |
+      téléphone fixe
+      poste téléphonique
+      appels externes
+      ligne telephonique
+      standard
+      réception
+
+  - intent: get_parking
+    examples: |
+      parking
+      места de parking
+      accès parking
+      voiture
+      garage
+
+  - intent: get_app_info
+    examples: |
+      qu'est-ce que issue tracker
+      c'est quoi issue tracker
+      comment fonctionne l'application
+      comment marche l'application
+      présentation de l'application
+      expliquer l'application
+      à quoi sert l'application
+      c'est quoi cette application
+
+  - intent: how_to_create_ticket
+    examples: |
+      comment créer un ticket
+      comment faire une demande
+      comment ouvrir un ticket
+      je veux créer un ticket
+      nouvelle demande
+      procedure création ticket
+      étapes pour créer un ticket
+
+  - intent: how_to_follow_ticket
+    examples: |
+      comment suivre un ticket
+      où voir mes tickets
+      statut de mon ticket
+      suivre ma demande
+      comment vérifier avancement
+      consulter mes tickets
+
+  - intent: what_are_categories
+    examples: |
+      quelles sont les catégories
+      catégories de tickets
+      types de demandes
+      catégories disponibles
+      différence entre catégories
+
+  - intent: what_are_statuses
+    examples: |
+      quels sont les statuts
+      statuts d'un ticket
+      workflow ticket
+      états d'un ticket
+      que signifie ce statut
+
+  - intent: how_to_contact_support
+    examples: |
+      comment contacter le support
+      joindre le support
+      support technique
+      contacter l'équipe IT
+      numéro support
+      email support
+
+  - intent: how_to_modify_profile
+    examples: |
+      comment modifier mon profil
+      changer mes informations
+      mise à jour profil
+      modifier compte
+      changer mot de passe
+      paramètres compte
+
+  - intent: how_to_upload_screenshot
+    examples: |
+      comment ajouter capture écran
+      upload image ticket
+      attacher une image
+      capture d'écran ticket
+      ajouter une photo
+
+  - intent: what_are_priorities
+    examples: |
+      quelles sont les priorités
+      priorités tickets
+      niveau priorité
+      différence critical high
+
+  - intent: what_is_dashboard
+    examples: |
+      c'est quoi le tableau de bord
+      à quoi sert le dashboard
+      statistiques tableau de bord
+      dashboard fonctionnalités
+
+  - intent: how_to_search_ticket
+    examples: |
+      comment rechercher un ticket
+      recherche tickets
+      trouver un ticket
+      filtrer les tickets
+
+  - intent: what_are_roles
+    examples: |
+      quels sont les rôles
+      rôles utilisateurs
+      différence admin support user
+      permissions rôles
+
+  - intent: how_to_change_theme
+    examples: |
+      comment changer thème
+      mode sombre clair
+      changer couleur application
+      thème interface

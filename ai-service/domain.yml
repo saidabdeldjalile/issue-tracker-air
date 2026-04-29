@@ -1,0 +1,190 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - create_ticket
+  - track_ticket
+  - get_password_help
+  - get_wifi_help
+  - get_vpn_help
+  - get_hardware_request
+  - get_leave_request
+  - get_equipment_issue
+  - get_email_issue
+  - get_building_issue
+  - urgent_issue
+  - ask_human
+  - how_are_you
+  - bot_capabilities
+  - faq_search
+  - get_id_card
+  - get_salary_info
+  - get_annual_leave
+  - get_training
+  - get_software_license
+  - get_printer_issue
+  - get_phone_issue
+  - get_parking
+  - get_thanks
+  - search_faq
+
+entities:
+  - equipment
+  - software
+  - dates
+  - locations
+  - ticket_ids
+  - department
+  - priority
+
+slots:
+  ticket_id:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: ticket_ids
+  department:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: department
+  priority:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: priority
+  user_email:
+    type: text
+    mappings:
+    - type: from_text
+  session_id:
+    type: text
+    mappings:
+    - type: from_text
+
+responses:
+  utter_greet:
+  - text: "Bonjour! Je suis l'assistant virtuel d'Air Algérie. Je peux vous aider à créer des tickets, suivre vos demandes, ou répondre à vos questions. Comment puis-je vous aider?"
+
+  utter_cheer_up:
+  - text: "Here is something to cheer you up:"
+    image: "https://i.imgur.com/nGF1K8f.jpg"
+
+  utter_did_that_help:
+  - text: "Did that help you?"
+
+  utter_happy:
+  - text: "Great, carry on!"
+
+  utter_goodbye:
+  - text: "Au revoir! N'hésitez pas à revenir si vous avez besoin d'aide. Bonne journée!"
+
+  utter_iamabot:
+  - text: "Je suis un assistant virtuel créé par l'équipe IT d'Air Algérie pour vous aider avec vos demandes."
+
+  utter_create_ticket_help:
+  - text: "Je vais créer un ticket pour vous. Décrivez-moi votre problème ou besoin en détail."
+
+  utter_track_ticket_help:
+  - text: "Pour suivre votre ticket, j'ai besoin de son numéro. Vous pouvez le trouver dans votre email de confirmation ou me donner le numéro."
+
+  utter_password_help:
+  - text: "Pour réinitialiser votre mot de passe:\n\n1. Allez dans Paramètres → Sécurité\n2. Cliquez sur 'Changer le mot de passe'\n3. Suivez les instructions\n\nOu je peux créer un ticket pour le support informatique."
+
+  utter_wifi_help:
+  - text: "Wi-Fi Air Algérie:\n\n📶 Réseau: AirAlgerie-Employee\n🔑 Mot de passe: Votre matricule\n\nSi vous avez un problème de connexion, je peux créer un ticket pour le support réseau."
+
+  utter_vpn_help:
+  - text: "Pour accéder au VPN:\n\n1. Téléchargez le client VPN depuis le portail IT\n2. Connectez-vous avec votre matricule\n3. Utilisez votre mot de passe habituel\n\nPour une demande d'accès VPN, je peux créer un ticket automatiquement."
+
+  utter_hardware_help:
+  - text: "Je vais créer une demande de matériel. Précisez-moi:\n\n- Quel équipement avez-vous besoin?\n- Pourquoi en avez-vous besoin?"
+
+  utter_leave_help:
+  - text: "Pour une demande de congés:\n\n- Type de congés (annuel, maladie, autre)\n- Dates souhaitées\n\nJe vais créer un ticket pour le service RH."
+
+  utter_equipment_issue_help:
+  - text: "Pouvez-vous me donner plus de détails?\n\n- Quel équipement?\n- Depuis quand?\n- Avez-vous un message d'erreur?"
+
+  utter_email_issue_help:
+  - text: "Pouvez-vous préciser votre problème Outlook?\n\n- Pas de réception?\n- Pas d'envoi?\n- Erreur de synchronisation?"
+
+  utter_building_issue_help:
+  - text: "Pouvez-vous préciser le problème?\n\n- Quel endroit exact?\n- Depuis quand?\n- C'est urgent?"
+
+  utter_urgent_help:
+  - text: "Je comprends que c'est urgent. Je vais créer un ticket prioritaire et alerter le support concerné."
+
+  utter_human_help:
+  - text: "Je vais transmettre votre demande à un agent. Un membre du support va vous contacter sous peu."
+
+  utter_how_are_you:
+  - text: "Je vais bien, merci! Et vous? Comment puis-je vous aider?"
+
+  utter_capabilities:
+  - text: "Je peux vous aider avec:\n\n🎫 Création et suivi de tickets\n💻 Problèmes IT (wifi, mot de passe, vpn)\n🏠 Demandes de matériel\n📅 Congés et absences\n🏢 Problèmes de bâtiment\n❓ Questions générales\n\nPosez-moi votre question!"
+
+  utter_faq_found:
+  - text: "J'ai trouvé une réponse dans notre base de connaissances:"
+
+  utter_faq_not_found:
+  - text: "Je n'ai pas trouvé de réponse exacte. Je peux créer un ticket pour vous aider."
+
+  utter_id_card_help:
+  - text: "Pour votre carte d'embarquement ou badge:\n\n1. Adressez-vous au bureau du fret\n2. Appelez le standard\n3. Ou je peux créer un ticket pour le service concerné."
+
+  utter_salary_help:
+  - text: "Pour toute question concernant votre salaire:\n\n- Le bulletin de paie est disponible sur le portail RH\n- Pour une demande spécifique, contactez le service Payroll\n- Je peux créer un ticket pour le service RH."
+
+  utter_annual_leave_help:
+  - text: "Pour vos droits aux congés:\n\n- Consultez votre planning dans le portail RH\n- Les jours restants sont indiqués dans votre profil\n- Pour une demande de congés, soumettez via le portail RH."
+
+  utter_training_help:
+  - text: "Pour les formations:\n\n- LinkedIn Learning est disponible\n- formations internes: voir le calendrier RH\n- Certifications: contacter le service formation\n- Je peux vous orienter vers le bon service."
+
+  utter_software_license_help:
+  - text: "Pour une license logicielle:\n\n- Microsoft 365 est fourni par défaut\n- Autres logiciels: créer un ticket pour le service IT\n- Précisez le logiciel souhaité."
+
+  utter_printer_help:
+  - text: "Pour un problème d'imprimante:\n\n1. Vérifiez le papier et toner\n2. Redémarrez l'imprimante\n3. Réinstallez le pilote\n\nSi toujours problème, je crée un ticket."
+
+  utter_phone_help:
+  - text: "Pour le téléphone fixe:\n\n- Appelez le standard pour les transferts\n- Pour un problème technique, je crée un ticket."
+
+  utter_parking_help:
+  - text: "Pour le parking:\n\n- Adressez-vous au service Logement/Bureau\n- Capacité limitée\n- Demande via le portail RH."
+
+actions:
+  - action_create_ticket
+  - action_track_ticket
+  - action_search_faq
+  - action_analyze_sentiment
+  - action_classify_request
+  - utter_greet
+  - utter_cheer_up
+  - utter_did_that_help
+  - utter_happy
+  - utter_goodbye
+  - utter_iamabot
+  - utter_create_ticket_help
+  - utter_track_ticket_help
+  - utter_password_help
+  - utter_wifi_help
+  - utter_vpn_help
+  - utter_hardware_help
+  - utter_leave_help
+  - utter_equipment_issue_help
+  - utter_email_issue_help
+  - utter_building_issue_help
+  - utter_urgent_help
+  - utter_human_help
+  - utter_how_are_you
+  - utter_capabilities
+  - utter_faq_found
+  - utter_faq_not_found

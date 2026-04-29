@@ -1,0 +1,166 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: issue-tracker-db
+    environment:
+      POSTGRES_DB: issue_tracker_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - issue-tracker-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d issue_tracker_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: issue-tracker-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - issue-tracker-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: issue-tracker-backend
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/issue_tracker_db
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-default-secret-change-me}
+      CLASSIFICATION_SERVICE_URL: http://ai-chatbot:5001
+      CHATBOT_SERVICE_URL: http://ai-chatbot:5001
+      DUPLICATE_SERVICE_URL: http://duplicate-service:5000
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000,http://localhost:5174,http://frontend:80}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+    ports:
+      - "6969:6969"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai-chatbot:
+        condition: service_started
+      duplicate-service:
+        condition: service_started
+    networks:
+      - issue-tracker-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6969/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./issue-tracker-web
+      dockerfile: Dockerfile
+    container_name: issue-tracker-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - issue-tracker-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+   ai-chatbot:
+     build:
+       context: ./ai-service
+       dockerfile: Dockerfile
+     container_name: ai-chatbot
+     command: python run.py
+     ports:
+       - "5001:5001"
+     environment:
+       - FLASK_ENV=production
+       - BACKEND_URL=http://backend:6969/api
+       - OLLAMA_URL=http://host.docker.internal:11434
+     volumes:
+       - ./ai-service/models:/app/models
+     depends_on:
+       rasa-actions:
+         condition: service_started
+     networks:
+       - issue-tracker-network
+     healthcheck:
+       test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+       interval: 30s
+       timeout: 10s
+       retries: 3
+       start_period: 60s
+     restart: unless-stopped
+
+  rasa-actions:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: rasa-actions
+    command: python -m rasa_sdk --actions actions_server --port 5055
+    ports:
+      - "5055:5055"
+    environment:
+      - ACTIONS_PORT=5055
+    networks:
+      - issue-tracker-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5055/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  duplicate-service:
+    build:
+      context: ./duplicate-detection
+      dockerfile: Dockerfile
+    container_name: duplicate-service
+    ports:
+      - "5000:5000"
+    networks:
+      - issue-tracker-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  issue-tracker-network:
+    driver: bridge

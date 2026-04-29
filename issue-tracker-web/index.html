@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      // Synchronize dark class with data-theme attribute for Tailwind CSS dark mode
+      (function() {
+        // Get saved theme from localStorage or default to 'light'
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        
+        function updateDarkClass() {
+          const html = document.documentElement;
+          const theme = html.getAttribute('data-theme') || 'light';
+          if (theme === 'dark') {
+            html.classList.add('dark');
+          } else {
+            html.classList.remove('dark');
+          }
+        }
+        
+        // Run on load
+        updateDarkClass();
+        
+        // Observe changes to data-theme attribute
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'data-theme') {
+              updateDarkClass();
+              // Save theme preference to localStorage
+              const theme = document.documentElement.getAttribute('data-theme') || 'light';
+              localStorage.setItem('theme', theme);
+            }
+          });
+        });
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ['data-theme']
+        });
+      })();
+
+      // DEFINTIVE FIX for SockJS 'unload' violation
+      // This patch must run before any other script to suppress the Chrome 'unload' deprecation warning
+      (function() {
+        const originalAddEventListener = window.addEventListener;
+        window.addEventListener = function(type, listener, options) {
+          if (type === 'unload' || type === 'beforeunload') {
+            console.debug('Prevented registration of ' + type + ' event to avoid violation');
+            return;
+          }
+          return originalAddEventListener.call(this, type, listener, options);
+        };
+
+        // Also patch attachEvent for older patterns
+        if (window.attachEvent) {
+          const originalAttachEvent = window.attachEvent;
+          window.attachEvent = function(type, listener) {
+            if (type === 'onunload' || type === 'onbeforeunload') return;
+            return originalAttachEvent.call(this, type, listener);
+          };
+        }
+
+        // Prevent direct assignment to onunload/onbeforeunload
+        try {
+          Object.defineProperties(window, {
+            'onunload': { set: () => {}, get: () => null, configurable: true },
+            'onbeforeunload': { set: () => {}, get: () => null, configurable: true }
+          });
+        } catch (e) {}
+      })();
+    </script>
+
+    <link rel="icon" type="image/png" href="/images/air-algerie.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1e40af" />
+    <meta name="description" content="Application de suivi des tickets et problèmes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Issue Tracker" />
+    <link rel="apple-touch-icon" href="/images/air-algerie.png" />
+    <title>Issue Tracker</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+
+</html>

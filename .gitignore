@@ -1,0 +1,63 @@
+# Spring Boot / Maven
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Node / Frontend ###
+node_modules/
+issue-tracker-web/node_modules/
+issue-tracker-web/dist/
+issue-tracker-web/dist-ssr/
+.env
+.env.local
+*.local
+
+### Logs & Temp ###
+tmp/
+*.log
+logs/
+server.log
+server_err.log
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Specifics ###
+duplicate-detection/dupenv
+duplicate-detection/venv
+venv/
+env/
+.venv/
+.env/
+uploads/screenshots/

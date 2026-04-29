@@ -1,0 +1,244 @@
+version: "3.1"
+
+stories:
+
+- story: happy path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_great
+  - action: utter_happy
+
+- story: sad path 1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_cheer_up
+  - action: utter_did_that_help
+  - intent: affirm
+  - action: utter_happy
+
+- story: sad path 2
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_cheer_up
+  - action: utter_did_that_help
+  - intent: deny
+  - action: utter_goodbye
+
+- story: bot challenge
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- story: create ticket flow
+  steps:
+  - intent: create_ticket
+  - action: utter_create_ticket_help
+  - action: action_create_ticket
+
+- story: track ticket flow
+  steps:
+  - intent: track_ticket
+  - action: utter_track_ticket_help
+  - action: action_track_ticket
+
+- story: password help
+  steps:
+  - intent: get_password_help
+  - action: utter_password_help
+
+- story: wifi help
+  steps:
+  - intent: get_wifi_help
+  - action: utter_wifi_help
+
+- story: vpn help
+  steps:
+  - intent: get_vpn_help
+  - action: utter_vpn_help
+
+- story: hardware request
+  steps:
+  - intent: get_hardware_request
+  - action: utter_hardware_help
+  - action: action_create_ticket
+
+- story: leave request
+  steps:
+  - intent: get_leave_request
+  - action: utter_leave_help
+  - action: action_create_ticket
+
+- story: equipment issue
+  steps:
+  - intent: get_equipment_issue
+  - action: utter_equipment_issue_help
+  - action: action_create_ticket
+
+- story: email issue
+  steps:
+  - intent: get_email_issue
+  - action: utter_email_issue_help
+  - action: action_create_ticket
+
+- story: building issue
+  steps:
+  - intent: get_building_issue
+  - action: utter_building_issue_help
+  - action: action_create_ticket
+
+- story: urgent issue
+  steps:
+  - intent: urgent_issue
+  - action: utter_urgent_help
+  - action: action_create_ticket
+
+- story: ask human
+  steps:
+  - intent: ask_human
+  - action: utter_human_help
+
+- story: how are you
+  steps:
+  - intent: how_are_you
+  - action: utter_how_are_you
+
+- story: bot capabilities
+  steps:
+  - intent: bot_capabilities
+  - action: utter_capabilities
+
+- story: faq search
+  steps:
+  - intent: search_faq
+  - action: action_search_faq
+  - action: utter_faq_found
+
+- story: goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: thanks
+  steps:
+  - intent: thanks
+  - action: utter_happy
+
+- story: id card help
+  steps:
+  - intent: get_id_card
+  - action: utter_id_card_help
+  - action: action_create_ticket
+
+- story: salary help
+  steps:
+  - intent: get_salary_info
+  - action: utter_salary_help
+
+- story: annual leave help
+  steps:
+  - intent: get_annual_leave
+  - action: utter_annual_leave_help
+
+- story: training help
+  steps:
+  - intent: get_training
+  - action: utter_training_help
+
+- story: software license help
+  steps:
+  - intent: get_software_license
+  - action: utter_software_license_help
+  - action: action_create_ticket
+
+- story: printer issue help
+  steps:
+  - intent: get_printer_issue
+  - action: utter_printer_help
+  - action: action_create_ticket
+
+- story: phone issue help
+  steps:
+  - intent: get_phone_issue
+  - action: utter_phone_help
+  - action: action_create_ticket
+
+- story: parking help
+  steps:
+  - intent: get_parking
+  - action: utter_parking_help
+
+- story: search faq route
+  steps:
+  - intent: search_faq
+  - action: action_search_faq
+  - action: utter_faq_found
+
+- story: app info question
+  steps:
+  - intent: get_app_info
+  - action: utter_app_info
+
+- story: how to create ticket
+  steps:
+  - intent: how_to_create_ticket
+  - action: utter_how_to_create_ticket
+
+- story: how to follow ticket
+  steps:
+  - intent: how_to_follow_ticket
+  - action: utter_how_to_follow_ticket
+
+- story: what are categories
+  steps:
+  - intent: what_are_categories
+  - action: utter_what_are_categories
+
+- story: what are statuses
+  steps:
+  - intent: what_are_statuses
+  - action: utter_what_are_statuses
+
+- story: how to contact support
+  steps:
+  - intent: how_to_contact_support
+  - action: utter_how_to_contact_support
+
+- story: how to modify profile
+  steps:
+  - intent: how_to_modify_profile
+  - action: utter_how_to_modify_profile
+
+- story: how to upload screenshot
+  steps:
+  - intent: how_to_upload_screenshot
+  - action: utter_how_to_upload_screenshot
+
+- story: what are priorities
+  steps:
+  - intent: what_are_priorities
+  - action: utter_what_are_priorities
+
+- story: what is dashboard
+  steps:
+  - intent: what_is_dashboard
+  - action: utter_what_is_dashboard
+
+- story: how to search ticket
+  steps:
+  - intent: how_to_search_ticket
+  - action: utter_how_to_search_ticket
+
+- story: what are roles
+  steps:
+  - intent: what_are_roles
+  - action: utter_what_are_roles
+
+- story: how to change theme
+  steps:
+  - intent: how_to_change_theme
+  - action: utter_how_to_change_theme

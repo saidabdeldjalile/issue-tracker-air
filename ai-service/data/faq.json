@@ -1,0 +1,192 @@
+[
+  {
+    "question": "Comment réinitialiser mon mot de passe ?",
+    "answer": "Pour réinitialiser votre mot de passe :\n1. Allez dans Paramètres → Sécurité\n2. Cliquez sur 'Changer le mot de passe'\n3. Suivez les instructions\n\nSi vous ne réussissez pas, contactez le support IT.",
+    "category": "IT"
+  },
+  {
+    "question": "Comment se connecter au Wi-Fi ?",
+    "answer": "Wi-Fi Air Algérie :\n📶 Réseau: AirAlgerie-Employee\n🔑 Mot de passe: Votre matricule personnel\n\nContactez le support si vous avez des problèmes de connexion.",
+    "category": "IT"
+  },
+  {
+    "question": "Comment demander un congé ?",
+    "answer": "Pour une demande de congés :\n1. Connectez-vous au portail RH\n2. Allez dans 'Mes demandes' → 'Nouveau congé'\n3. Sélectionnez le type de congé et les dates\n4. Soumettez la demande\n\nLe managerrecevra une notification pour approbation.",
+    "category": "RH"
+  },
+  {
+    "question": "Comment demander du matériel ?",
+    "answer": "Pour demander du matériel :\n1. Créez un ticket sur le portail\n2. Sélectionnez la catégorie 'Matériel'\n3. Décrivez l'équipement nécessaire\n4. Justifiez votre demande\n\nLe service Achats traitera votre demande.",
+    "category": "Matériel"
+  },
+  {
+    "question": "Comment accéder au VPN ?",
+    "answer": "Pour accéder au VPN :\n1. Téléchargez le client VPN depuis le portail IT\n2. Connectez-vous avec votre matricule\n3. Utilisez votre mot de passe habituel\n\nContactez le support IT pour une demande d'accès VPN.",
+    "category": "IT"
+  },
+  {
+    "question": "Mon ordinateur ne démarre pas",
+    "answer": "Si votre ordinateur ne démarre pas :\n1. Vérifiez qu'il est branché\n2. Appuyez sur le bouton d'alimentation pendant 10 secondes\n3. Rallumez-le\n\nSi le problème persiste, créez un ticket IT.",
+    "category": "IT"
+  },
+  {
+    "question": "Imprimante ne fonctionne pas",
+    "answer": "Si l'imprimante ne fonctionne pas :\n1. Vérifiez qu'elle est allumée et connectée\n2. Redémarrez l'imprimante\n3. Vérifiez la connexion réseau\n4. Relancez le travail d'impression\n\nSi ça ne marche pas, créez un ticket pour le support.",
+    "category": "IT"
+  },
+  {
+    "question": "Comment modifier mes informations personnelles ?",
+    "answer": "Pour modifier vos informations personnelles :\n1. Allez dans Mon Profil → Modifier\n2. Mettez à jour vos informations\n3. Sauvegardez\n\nCertaines informations nécessitent une validation RH.",
+    "category": "RH"
+  },
+  {
+    "question": "Salle de réunion unavailable",
+    "answer": "Pour réserver une salle de réunion :\n1. Allez dans Calendrier → Nouvelle réservation\n2. Sélectionnez la salle disponible\n3. Définissez les horaires\n4. Invitez les participants\n\nContactez l'administration si besoin.",
+    "category": "Administratif"
+  },
+  {
+    "question": "Comment contacter le support IT ?",
+    "answer": "Pour contacter le support IT :\n1. Créez un ticket via le portail\n2. Ou envoyez un email à support@airalgerie.dz\n3. Ou appelez le 1234\n\nLe support est disponible 24h/24 pour les urgences.",
+    "category": "IT"
+  },
+  {
+    "question": "Je n'arrive pas à me connecter à mon compte",
+    "answer": "Si vous n'arrivez pas à vous connecter :\n1. Vérifiez votre matricule et mot de passe\n2. Vérifiez que le clavier n'est pas en majuscules\n3. Essayez de réinitialiser votre mot de passe\n4. Si le problème persiste, contactez le support IT.",
+    "category": "IT"
+  },
+  {
+    "question": "Comment activer mon compte email ?",
+    "answer": "Pour activer votre compte email :\n1. Utilisez votre matricule comme identifiant\n2. Le mot de passe initial est votre mot de passe Windows\n3. Changez-le lors de la première connexion\n\nContactez le support si besoin.",
+    "category": "IT"
+  },
+  {
+    "question": "Comment faire une demande de formation ?",
+    "answer": "Pour une demande de formation :\n1. Allez dans l'application RH\n2. Sélectionnez 'Demandes de formation'\n3. Choisissez la formation souhaitée\n4. Soumettez votre demande\n\nVotre manager doit approuver.",
+    "category": "RH"
+  },
+  {
+    "question": "Mon écran est noir",
+    "answer": "Si votre écran est noir :\n1. Vérifiez les connexions du câble\n2. Appuyez sur une touche pour réveiller l'écran\n3. Vérifiez la luminosité\n4. Redémarrez l'ordinateur\n\nCréez un ticket si le problème persiste.",
+    "category": "IT"
+  },
+  {
+    "question": "Lenteur de l'ordinateur",
+    "answer": "Si votre ordinateur est lent :\n1. Fermez les applications inutiles\n2. Redémarrez votre ordinateur\n3. Vérifiez l'espace disque restant\n4. Scannez pour des virus\n\nContactez le support si aucune amélioration.",
+    "category": "IT"
+  },
+  {
+    "question": "Comment déclarer un incident ?",
+    "answer": "Pour déclarer un incident :\n1. Connectez-vous au portail\n2. Cliquez sur 'Nouveau ticket'\n3. Décrivez le problème\n4. Sélectionnez la catégorie appropriée\n\nLe support traitera votre demande rapidement.",
+    "category": "IT"
+  },
+  {
+    "question": "Comment obtenir un badge ?",
+    "answer": "Pour obtenir un badge :\n1. Faites une demande auprès de la sécurité\n2. Validez par votre manager\n3. Récupérez le badge au bureau\n\nContactez l'administration pour plus d'informations.",
+    "category": "Administratif"
+  },
+  {
+    "question": "Problème avec Outlook",
+    "answer": "Pour les problèmes Outlook :\n1. Fermez et rouvrez Outlook\n2. Vérifiez votre connexion internet\n3. Vérifiez les paramètres de compte\n4. Redémarrez votre ordinateur\n\nCréez un ticket si le problème persiste.",
+    "category": "IT"
+  },
+  {
+    "question": "Comment demander un changement de bureau ?",
+    "answer": "Pour un changement de bureau :\n1. Faites une demande écrite au service RH\n2. Justifiez votre demande\n3. Attendez la confirmation\n\nContactez l'administration pour le processus complet.",
+    "category": "RH"
+  },
+  {
+    "question": "Je ne peux pas imprimante",
+    "answer": "Si vous ne pouvez pas imprimer :\n1. Vérifiez que l'imprimante est allumée\n2. Vérifiez la file d'impression\n3. Réinstallez le driver si nécessaire\n4.Contactez le support IT si rien ne fonctionne.",
+    "category": "IT"
+  },
+  {
+    "question": "Qu'est-ce que IssueTracker?",
+    "answer": "IssueTracker est l'application interne de gestion de tickets d'Air Algérie. Elle permet de créer, suivre et gérer les demandes des employés (IT, RH, matériel, maintenance). C'est une plateforme web accessible depuis votre navigateur.",
+    "category": "Application"
+  },
+  {
+    "question": "Comment créer un ticket?",
+    "answer": "Pour créer un ticket:\n1. Connectez-vous à l'application\n2. Cliquez sur 'Nouveau Ticket' dans le menu\n3. Remplissez le titre (max 100 caractères)\n4. Décrivez votre problème/demande en détail\n5. Sélectionnez la catégorie appropriée\n6. Choisissez la priorité (Critical, High, Medium, Low)\n7. (Optionnel) Sélectionnez un projet\n8. Cliquez sur 'Soumettre'\n\nVous recevrez un numéro de ticket par email.",
+    "category": "Application"
+  },
+  {
+    "question": "Comment fonctionne l'application?",
+    "answer": "IssueTracker fonctionne comme suit:\n\n1. **Authentification**: Connexion sécurisée avec JWT\n2. **Dashboard**: Vue d'ensemble avec statistiques\n3. **Tickets**: Création et suivi des demandes\n4. **Catégories**: Automatiquement routées vers le bon département (IT, RH, Achats, Maintenance)\n5. **Notifications**: Alertes en temps réel via SSE\n6. **Chatbot**: Assistant intelligent pour créer des tickets et répondre aux questions\n7. **Détection doublons**: IA qui détecte les tickets similaires\n\nL'application est accessible depuis http://localhost:5173 (développement) ou http://localhost:80 (production Docker).",
+    "category": "Application"
+  },
+  {
+    "question": "Quelles sont les catégories de tickets?",
+    "answer": "Les catégories de tickets sont:\n\n• **Informatique (IT)** - Problèmes techniques, logiciels, réseau, VPN, email, bugs\n• **Matériel** - Demandes d'équipement, imprimantes, ordinateurs, téléphones\n• **Administratif (RH)** - Congés, contrats, salaires, attestations\n• **Maintenance** - Bâtiment, climatisation, électricité, plomberie\n• **Formation** - Demandes de formation, cours\n• **Autres** - Demandes diverses\n\nLa catégorie détermine automatiquement le département responsable.",
+    "category": "Application"
+  },
+  {
+    "question": "Comment suivre l'état de mon ticket?",
+    "answer": "Pour suivre un ticket:\n1. Allez dans la section 'Tickets'\n2. Utilisez les filtres pour trouver votre ticket\n3. Cliquez sur le numéro du ticket pour voir les détails\n4. Les commentaires et mises à jour sont affichés\n5. Vous recevez des notifications par email pour chaque changement de statut\n\nVous pouvez aussi demander au chatbot: 'Quel est le statut de mon ticket #XXX'.",
+    "category": "Application"
+  },
+  {
+    "question": "Quels sont les statuts d'un ticket?",
+    "answer": "Les statuts d'un ticket suivent ce workflow:\n\n• **Open** - Nouveau ticket, pas encore traité\n• **ToDo** - Ticket planifié pour traitement\n• **InProgress** - En cours de résolution\n• **Done** - Résolu, en attente de validation\n• **Closed** - Fermé (clôturé)\n• **Deleted** - Supprimé (archivé)\n\nLe statut évolue automatiquement lors du traitement par le support.",
+    "category": "Application"
+  },
+  {
+    "question": "Comment modifier mon profil?",
+    "answer": "Pour modifier votre profil:\n1. Cliquez sur votre nom en haut à droite\n2. Sélectionnez 'Mon Profil' ou 'Paramètres'\n3. Modifiez vos informations (nom, email, téléphone, etc.)\n4. Cliquez sur 'Enregistrer'\n\nNote: Certaines informations (département, rôle) ne sont modifiables que par un ADMIN.",
+    "category": "Application"
+  },
+  {
+    "question": "Comment contacter le support?",
+    "answer": "Pour contacter le support:\n• Créez un ticket via l'application (méthode recommandée)\n• Répondez aux notifications email\n• Utilisez le chatbot pour une assistance immédiate\n• Contactez le support IT au 1234 (urgences 24/7)\n• Email: support@airalgerie.dz\n\nUn ticket crée une trace écrite et garantit un suivi.",
+    "category": "Application"
+  },
+  {
+    "question": "Comment ajouter une capture d'écran à un ticket?",
+    "answer": "Pour ajouter une capture d'écran:\n1. Dans la création/édition de ticket, cliquez sur 'Ajouter une image'\n2. Sélectionnez le fichier (max 10MB, formats: PNG, JPG, JPEG, GIF)\n3. Cliquez sur 'Télécharger'\n4. La capture apparaît dans la section 'Screenshots'\n\nLes captures aident le support à comprendre le problème.",
+    "category": "Application"
+  },
+  {
+    "question": "Comment supprimer un ticket?",
+    "answer": "Pour supprimer un ticket:\n1. Allez dans la section 'Tickets'\n2. Trouvez le ticket à supprimer\n3. Cliquez sur l'icône corbeille ou bouton 'Supprimer'\n4. Confirmez la suppression\n\nNote: Seuls les ADMIN et le créateur du ticket peuvent le supprimer. Le ticket n'est pas réellement effacé, son statut passe à 'Deleted' (archivage).",
+    "category": "Application"
+  },
+  {
+    "question": "Comment assigner un ticket à un utilisateur?",
+    "answer": "Pour assigner un ticket:\n1. Ouvrez le ticket\n2. Cliquez sur le champ 'Assigné à'\n3. Sélectionnez un utilisateur dans la liste\n4. Le titulaire reçoit une notification\n\nLes tickets sont automatiquement assignés selon la catégorie (ex: IT → département IT).",
+    "category": "Application"
+  },
+  {
+    "question": "Comment fonctionne la détection de doublons?",
+    "answer": "La détection de doublons utilise l'IA (Sentence Transformers):\n\n1. Quand vous créez un ticket, le système analyse la description\n2. Il recherche des tickets similaires dans la base\n3. Si similarité > 60%, une suggestion apparaît\n4. Vous pouvez consulter les tickets similaires avant de soumettre\n\nCela évite les doublons et permet de retrouver des solutions existantes.",
+    "category": "Application"
+  },
+  {
+    "question": "Quelles sont les priorités d'un ticket?",
+    "answer": "Les priorités:\n\n• **Critical** - Bloquant, impact majeur sur l'activité (ex: système down)\n• **High** - Urgent, important (ex: problème empêchant le travail)\n• **Medium** - Normal, à traiter dans les délais standards\n• **Low** - Mineur, faible impact (ex: amélioration cosmétique)\n\nLe chatbot détecte automatiquement les urgences (mots-clés: urgent, critique, bloquant) et suggère une priorité High.",
+    "category": "Application"
+  },
+  {
+    "question": "Comment utiliser le chatbot?",
+    "answer": "Le chatbot est disponible en bas à droite de l'interface.\n\nVous pouvez lui demander:\n• 'Crée un ticket pour problème ordinateur'\n• 'Comment réinitialiser mon mot de passe?'\n• 'Où en est mon ticket #123?'\n• 'Combien de tickets ouverts?' (si contexte fourni)\n• 'Quelles sont les fonctionnalités?'\n\nIl peut créer des tickets, répondre aux questions FAQ, et vous orienter. Tapez 'aide' pour voir ce qu'il peut faire.",
+    "category": "Application"
+  },
+  {
+    "question": "Quels rôles existent dans l'application?",
+    "answer": "Les rôles utilisateurs:\n\n• **ADMIN** - Gestion complète: créer/modifier/supprimer tout, gérer utilisateurs, projets, départements\n• **SUPPORT** - Traitement des tickets, assignment, mise à jour statuts, commentaires\n• **USER** - Utilisateur standard: créer ses propres tickets, les consulter, commenter\n\nLes rôles sont assignés par l'administrateur.",
+    "category": "Application"
+  },
+  {
+    "question": "Comment changer le thème (clair/sombre)?",
+    "answer": "Pour changer le thème:\n1. Cliquez sur l'icône soleil/lune en haut à droite\n2. L'application bascule entre mode clair et sombre\n3. Votre préférence est sauvegardée localement\n\nLe thème s'applique à toute l'interface.",
+    "category": "Application"
+  },
+  {
+    "question": "Où trouver le tableau de bord?",
+    "answer": "Le tableau de bord est la page d'accueil après connexion. Il affiche:\n\n• Nombre total de tickets\n• Répartition par statut (Open, InProgress, Done, Closed)\n• Répartition par priorité\n• Tickets récents\n• Statistiques par département\n• Graphiques visuels\n\nVous pouvez y accéder à tout moment via le menu 'Dashboard'.",
+    "category": "Application"
+  },
+  {
+    "question": "Comment rechercher un ticket?",
+    "answer": "Pour rechercher un ticket:\n1. Allez dans 'Tickets'\n2. Utilisez la barre de recherche en haut\n3. Tapez mots-clés dans titre ou description\n4. Filtrez par: statut, priorité, catégorie, projet, assigné, date\n5. Cliquez sur 'Filtrer'\n\nLa recherche est full-text et retourne les tickets correspondants avec pagination.",
+    "category": "Application"
+  }
+]

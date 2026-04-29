@@ -1,0 +1,51 @@
+services:
+  frontend:
+    build: issue-tracker-web
+    image: suryakn/issuetracker-frontend:aws
+    ports:
+      - 5173:5173
+    depends_on:
+      - backend
+
+  backend:
+    build: .
+    image: suryakn/issuetracker-backend
+    ports:
+      - 6969:6969
+    environment:
+      - POSTGRES_DB=issue_tracker_db
+      - POSTGRES_URL=jdbc:postgresql://db:5432/issue_tracker_db
+      - DUPLICATE_SERVICE_URL=http://duplication-service:5000
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      # - JWT_SECRET= 
+    networks:
+      - issue-tracker
+
+
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - issue-tracker
+    environment:
+      - POSTGRES_DB=issue_tracker_db
+      - POSTGRES_PASSWORD=postgres
+    expose:
+      - 5432
+
+  duplication-service:
+    image: suryakn/issuetracker-duplication-service
+    build: duplicate-detection
+    networks:
+      - issue-tracker
+    expose:
+      - 5000
+
+volumes:
+  db-data:
+
+networks:
+  issue-tracker:

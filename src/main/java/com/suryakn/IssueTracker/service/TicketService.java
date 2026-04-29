@@ -1,0 +1,1117 @@
+package com.suryakn.IssueTracker.service;
+
+import com.suryakn.IssueTracker.classification.ClassificationResponse;
+import com.suryakn.IssueTracker.classification.ClassificationService;
+import com.suryakn.IssueTracker.dto.*;
+import com.suryakn.IssueTracker.duplicate.DuplicateTicketRequest;
+import com.suryakn.IssueTracker.duplicate.DuplicateTicketService;
+import com.suryakn.IssueTracker.duplicate.PythonResponse;
+import com.suryakn.IssueTracker.entity.*;
+import com.suryakn.IssueTracker.repository.ProjectRepository;
+import com.suryakn.IssueTracker.repository.TicketRepository;
+import com.suryakn.IssueTracker.repository.UserRepository;
+import com.suryakn.IssueTracker.repository.VectorTableRepository;
+import com.suryakn.IssueTracker.entity.*;
+// import com.suryakn.IssueTracker.repository.AttachmentRepository;
+import com.suryakn.IssueTracker.repository.ProjectRepository;
+import com.suryakn.IssueTracker.repository.TicketRepository;
+import com.suryakn.IssueTracker.repository.UserRepository;
+import com.suryakn.IssueTracker.repository.VectorTableRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Comparator;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class TicketService {
+
+    private final TicketRepository ticketRepository;
+    private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
+    private final DuplicateTicketService duplicateTicketService;
+    private final ClassificationService classificationService;
+    private final RoutingService routingService;
+    private final VectorTableRepository vectorTableRepository;
+    private final CommentService commentService;
+    private final NotificationService notificationService;
+    private final EmailService emailService;
+    // private final AttachmentRepository attachmentRepository;
+    
+    /**
+     * Send notification to assigned user when the reporter modifies the ticket.
+     */
+    private void notifyAssignedOnReporterModification(Ticket ticket, UserEntity reporter, String actionDescription) {
+        if (ticket.getAssignedTo() == null) {
+            return;
+        }
+        
+        // Don't notify if the reporter is the same as assigned to
+        if (ticket.getAssignedTo().getId().equals(reporter.getId())) {
+            return;
+        }
+        
+        Department department = ticket.getProject() != null ? ticket.getProject().getDepartment() : null;
+        
+        notificationService.createNotification(
+            NotificationType.TICKET_MODIFIED,
+            "Ticket modifié par le reporter",
+            "Le ticket '" + ticket.getTitle() + "' a été modifié par " + reporter.getFirstName() + " " + reporter.getLastName() + ": " + actionDescription,
+            ticket.getAssignedTo(),
+            department,
+            ticket.getId()
+        );
+        
+        log.info("Notification sent to {} about ticket {} modification by reporter {}", 
+            ticket.getAssignedTo().getEmail(), ticket.getId(), reporter.getEmail());
+    }
+    
+    /**
+     * Send notification to admin users and assigned support when a ticket is modified by SUPPORT.
+     */
+    private void notifyAdminsAndAssignedSupport(Ticket ticket, UserEntity modifier, String actionDescription) {
+        Department department = ticket.getProject() != null ? ticket.getProject().getDepartment() : null;
+        if (department == null) {
+            return;
+        }
+        
+        // Notify all ADMIN users in the department
+        List<UserEntity> admins = userRepository.findAllByRoleAndDepartment(Role.ADMIN, department);
+        for (UserEntity admin : admins) {
+            // Avoid self-notification
+            if (!admin.getId().equals(modifier.getId())) {
+                notificationService.createNotification(
+                    NotificationType.TICKET_MODIFIED,
+                    "Ticket modifié",
+                    "Le ticket '" + ticket.getTitle() + "' a été modifié par " + modifier.getFirstName() + " " + modifier.getLastName() + ": " + actionDescription,
+                    admin,
+                    department,
+                    ticket.getId()
+                );
+            }
+        }
+        
+        // Notify assigned SUPPORT (if different from modifier)
+        if (ticket.getAssignedTo() != null && 
+            ticket.getAssignedTo().getRole() == Role.SUPPORT &&
+            !ticket.getAssignedTo().getId().equals(modifier.getId())) {
+            notificationService.createNotification(
+                NotificationType.TICKET_MODIFIED,
+                "Ticket modifié",
+                "Le ticket '" + ticket.getTitle() + "' a été modifié par " + modifier.getFirstName() + " " + modifier.getLastName() + ": " + actionDescription,
+                ticket.getAssignedTo(),
+                department,
+                ticket.getId()
+            );
+        }
+    }
+    
+    /**
+     * Send notification to the ticket reporter (creator) when SUPPORT modifies a ticket.
+     */
+    private void notifyReporterOnSupportModification(Ticket ticket, UserEntity modifier, String actionDescription) {
+        // Don't notify if there's no reporter
+        if (ticket.getCreatedBy() == null) {
+            return;
+        }
+        
+        // Don't notify if the modifier is the reporter themselves
+        if (ticket.getCreatedBy().getId().equals(modifier.getId())) {
+            return;
+        }
+        
+        Department department = ticket.getProject() != null ? ticket.getProject().getDepartment() : null;
+        
+        notificationService.createNotification(
+            NotificationType.TICKET_MODIFIED,
+            "Votre ticket a été modifié",
+            "Le ticket '" + ticket.getTitle() + "' a été modifié par le support: " + actionDescription,
+            ticket.getCreatedBy(),
+            department,
+            ticket.getId()
+        );
+        
+        log.info("Notification sent to reporter {} about ticket {} modification by SUPPORT {}", 
+            ticket.getCreatedBy().getEmail(), ticket.getId(), modifier.getEmail());
+    }
+
+    public ResponseEntity<Page<TicketResponse>> getAllTickets(Pageable pageable, String search) {
+        Page<Ticket> ticketPage;
+        if (search != null && !search.isBlank()) {
+            ticketPage = ticketRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(search, search, pageable);
+        } else {
+            ticketPage = ticketRepository.findAll(pageable);
+        }
+        List<TicketResponse> ticketResponses = new ArrayList<>();
+        for (Ticket ticket : ticketPage.getContent()) {
+            ticketResponses.add(getTicketResponse(ticket));
+        }
+        return ResponseEntity.ok(new PageImpl<>(ticketResponses, pageable, ticketPage.getTotalElements()));
+    }
+
+    public ResponseEntity<TicketResponse> getTicketById(Long id) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+        if (optionalTicket.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Ticket ticket = optionalTicket.get();
+        return ResponseEntity.ok(getTicketResponse(ticket));
+    }
+
+    @Transactional
+    public ResponseEntity<TicketResponse> addTicket(TicketRequest ticketRequest) {
+        log.info("Creating ticket. Request: project={}, title={}, reporter={}, assignee={}", 
+            ticketRequest.getProject(), ticketRequest.getTitle(), ticketRequest.getReporter(), ticketRequest.getAssignee());
+        
+        try {
+            // Validate required fields
+            if (ticketRequest.getTitle() == null || ticketRequest.getTitle().trim().isEmpty()) {
+                log.error("Ticket creation failed - Title is required");
+                return ResponseEntity.badRequest().build();
+            }
+            
+            if (ticketRequest.getProject() == null) {
+                log.error("Ticket creation failed - Project is required");
+                return ResponseEntity.badRequest().build();
+            }
+            
+            // Validate project exists
+            var projectOpt = projectRepository.findById(ticketRequest.getProject());
+            if (projectOpt.isEmpty()) {
+                log.error("Ticket creation failed - Project not found: {}", ticketRequest.getProject());
+                return ResponseEntity.badRequest().build();
+            }
+            Project project = projectOpt.get();
+            log.info("Found project: {}", project.getName());
+            
+            // Handle reporter - use provided email or first user as fallback
+            UserEntity userEntity;
+            if (ticketRequest.getReporter() != null && !ticketRequest.getReporter().trim().isEmpty()) {
+                var userOpt = userRepository.findByEmail(ticketRequest.getReporter());
+                if (userOpt.isEmpty()) {
+                    log.error("Ticket creation failed - Reporter not found: {}", ticketRequest.getReporter());
+                    return ResponseEntity.badRequest().build();
+                }
+                userEntity = userOpt.get();
+            } else {
+                // Fallback to first user
+                var users = userRepository.findAll();
+                if (users.isEmpty()) {
+                    log.error("Ticket creation failed - No users found in database");
+                    return ResponseEntity.badRequest().build();
+                }
+                userEntity = users.get(0);
+                log.warn("No reporter specified, using first user: {}", userEntity.getEmail());
+            }
+            log.info("Using reporter: {}", userEntity.getEmail());
+            
+            // Handle assignee - optional
+            UserEntity assignee = null;
+            if (ticketRequest.getAssignee() != null && !ticketRequest.getAssignee().trim().isEmpty()) {
+                var assigneeOpt = userRepository.findByEmail(ticketRequest.getAssignee());
+                if (assigneeOpt.isPresent()) {
+                    assignee = assigneeOpt.get();
+                } else {
+                    log.warn("Assignee not found: {}, skipping", ticketRequest.getAssignee());
+                }
+            }
+            
+            // Default values
+            Status defaultStatus = ticketRequest.getStatus() != null ? ticketRequest.getStatus() : Status.Open;
+            Priority defaultPriority = ticketRequest.getPriority() != null ? ticketRequest.getPriority() : Priority.Medium;
+            String defaultCategory = ticketRequest.getCategory() != null ? ticketRequest.getCategory() : "Autre";
+            Department routedDepartment = project.getDepartment();
+            String routingReason = "Projet sélectionné par l'utilisateur.";
+            
+            // Classification auto - si category non spécifiée
+            ClassificationResponse classification = null;
+            if (defaultCategory.equals("Autre") || defaultCategory.isEmpty()) {
+                try {
+                    classification = classificationService.classifyTicket(
+                        ticketRequest.getTitle(),
+                        ticketRequest.getDescription() != null ? ticketRequest.getDescription() : ""
+                    );
+                    if (classification != null && classification.getCategory() != null) {
+                        defaultCategory = classification.getCategory();
+                        if (classification.getSuggestedPriority() != null) {
+                            defaultPriority = Priority.valueOf(classification.getSuggestedPriority().toUpperCase());
+                        }
+                        
+                        // Auto-routing: trouver le projet dans le department recommandé
+                        if (classification.getSuggestedDepartment() != null) {
+                            var suggestedDept = routingService.findDepartmentByClassification(defaultCategory);
+                            if (suggestedDept.isPresent()) {
+                                Department dept = suggestedDept.get();
+                                routedDepartment = dept;
+                                routingReason = "Routage IA selon catégorie '" + defaultCategory + "' vers " + dept.getName() + ".";
+                                if (project.getDepartment() == null && !dept.getProjects().isEmpty()) {
+                                    project = dept.getProjects().get(0);
+                                    log.info("Auto-routing: ticket routed to project '{}' in department '{}'", 
+                                        project.getName(), dept.getName());
+                                }
+                            }
+                        }
+                        
+                        log.info("Classification auto: category={}, priority={}, department={}", 
+                            defaultCategory, defaultPriority, classification.getSuggestedDepartment());
+                    }
+                } catch (Exception e) {
+                    log.warn("Classification service unavailable: {}", e.getMessage());
+                }
+            }
+            
+            if (routedDepartment == null) {
+                routedDepartment = routingService.findDepartmentByClassification(defaultCategory).orElse(project.getDepartment());
+                if (routingReason == null || routingReason.isBlank()) {
+                    routingReason = "Routage métier basé sur la catégorie " + defaultCategory + ".";
+                }
+            }
+
+            if (assignee == null) {
+                assignee = selectAssigneeForDepartment(routedDepartment);
+                if (assignee != null) {
+                    log.info("Auto-assigned by workload to support: {}", assignee.getEmail());
+                }
+            }
+
+            // Duplicate detection - safe
+            PythonResponse pythonResponse = null;
+            try {
+                DuplicateTicketRequest dupReq = DuplicateTicketRequest.builder()
+                    .ticketId(2000L)
+                    .title(ticketRequest.getTitle())
+                    .description(ticketRequest.getDescription())
+                    .projectId(ticketRequest.getProject())
+                    .build();
+                pythonResponse = duplicateTicketService.processTicketEmbedding(dupReq);
+            } catch (Exception e) {
+                log.warn("Duplicate service unavailable: {}", e.getMessage());
+            }
+            
+            List<Long> ids = new ArrayList<>();
+            List<Ticket> similarTicketList = new ArrayList<>();
+            if (pythonResponse != null && pythonResponse.getSimilar_ticket_ids() != null) {
+                ids = pythonResponse.getSimilar_ticket_ids();
+                for (Long id : ids) {
+                    Optional<Ticket> ticketOptional = ticketRepository.findById(id);
+                    ticketOptional.ifPresent(similarTicketList::add);
+                }
+            }
+            
+            // Create and save ticket
+            Ticket ticket = Ticket.builder()
+                .title(ticketRequest.getTitle())
+                .description(ticketRequest.getDescription())
+                .status(defaultStatus)
+                .priority(defaultPriority)
+                .category(defaultCategory)
+                .routedDepartmentName(routedDepartment != null ? routedDepartment.getName() : null)
+                .routingReason(routingReason)
+                .workflowStage(determineWorkflowStage(defaultStatus))
+                .firstResponseDueAt(calculateFirstResponseDueAt(defaultPriority))
+                .resolutionDueAt(calculateResolutionDueAt(defaultPriority))
+                .createdBy(userEntity)
+                .assignedTo(assignee)
+                .project(project)
+                .build();
+            
+            // Handle duplicate
+            if (!ids.isEmpty()) {
+                ticket.setTitle("(duplicate #" + Collections.min(ids) + ") " + ticket.getTitle());
+                if (!similarTicketList.isEmpty()) {
+                    Ticket dupTicket = similarTicketList.get(0);
+                    if (dupTicket.getAssignedTo() != null) {
+                        ticket.setAssignedTo(dupTicket.getAssignedTo());
+                    }
+                }
+            }
+            
+            try {
+                Ticket newTicket = ticketRepository.save(ticket);
+                log.info("Ticket created successfully with ID: {}", newTicket.getId());
+                TicketResponse ticketResponse = getTicketResponse(newTicket, similarTicketList);
+                
+                // Vector storage - safe
+                if (pythonResponse != null && pythonResponse.getVector() != null) {
+                    addVectorTable(pythonResponse.getVector(), newTicket.getId(), ticketRequest.getProject());
+                }
+                
+                // Notifications - safe
+                try {
+                    if (project.getDepartment() != null) {
+                        notificationService.notifyDepartmentUsers(
+                            NotificationType.TICKET_CREATED,
+                            "Nouveau ticket créé",
+                            "Le ticket '" + newTicket.getTitle() + "' a été créé dans le projet " + project.getName(),
+                            project.getDepartment(),
+                            newTicket.getId()
+                        );
+                    }
+                    
+                    if (assignee != null && !assignee.getId().equals(userEntity.getId())) {
+                        notificationService.createNotification(
+                            NotificationType.TICKET_ASSIGNED,
+                            "Ticket vous a été assigné",
+                            "Le ticket '" + newTicket.getTitle() + "' vous a été assigné",
+                            assignee,
+                            project.getDepartment(),
+                            newTicket.getId()
+                        );
+                    }
+                 } catch (Exception e) {
+                     log.error("Error sending notifications for ticket {}: {}", newTicket.getId(), e.getMessage());
+                 }
+                 
+                 // Send email notifications - safe
+                 try {
+                     // Email to reporter (ticket creator)
+                     if (userEntity != null) {
+                         emailService.sendTicketCreatedNotification(newTicket, userEntity);
+                     }
+                     
+                     // Email to assignee if different from reporter
+                     if (assignee != null && !assignee.getId().equals(userEntity != null ? userEntity.getId() : null)) {
+                         emailService.sendTicketAssignedNotification(newTicket, assignee);
+                     }
+                 } catch (Exception e) {
+                     log.error("Error sending email notifications for ticket {}: {}", newTicket.getId(), e.getMessage());
+                 }
+                 
+                 return new ResponseEntity<>(ticketResponse, HttpStatus.CREATED);
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                log.error("Database constraint violation creating ticket: project={}, reporter={}. Error: {}", 
+                    ticketRequest.getProject(), ticketRequest.getReporter(), e.getMessage());
+                return ResponseEntity.badRequest().build();
+            } catch (Exception e) {
+                log.error("Unexpected error saving ticket: {}", e.getMessage(), e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } catch (Exception e) {
+            log.error("Unexpected error creating ticket: project={}, reporter={}, error={}", 
+                ticketRequest.getProject(), ticketRequest.getReporter(), e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body((TicketResponse) null);
+        }
+    }
+
+    public void addVectorTable(String vector, Long ticketId, Long projectId) {
+        vectorTableRepository
+                .save(VectorTable.builder().vector(vector).ticketId(ticketId).projectId(projectId).build());
+    }
+
+    public ResponseEntity<TicketResponse> updateTicket(TicketRequest ticketRequest, Long id) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+        return optionalTicket.map(ticket -> {
+            if (ticketRequest.getTitle() != null) {
+                ticket.setTitle(ticketRequest.getTitle());
+            }
+            if (ticketRequest.getDescription() != null) {
+                ticket.setDescription(ticketRequest.getDescription());
+            }
+            if (ticketRequest.getStatus() != null) {
+                ticket.setStatus(ticketRequest.getStatus());
+            }
+            if (ticketRequest.getPriority() != null) {
+                ticket.setPriority(ticketRequest.getPriority());
+            }
+            if (ticketRequest.getCategory() != null) {
+                ticket.setCategory(ticketRequest.getCategory());
+            }
+            ticketRepository.save(ticket);
+            return ResponseEntity.ok(getTicketResponse(ticket));
+        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    public ResponseEntity<TicketResponse> updateTicketPartial(Long id, TicketUpdateRequest updateRequest) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+        return optionalTicket.map(ticket -> {
+            Status oldStatus = ticket.getStatus();
+            UserEntity oldAssignee = ticket.getAssignedTo();
+            
+            if (updateRequest.getTitle() != null && !updateRequest.getTitle().isEmpty()) {
+                ticket.setTitle(updateRequest.getTitle());
+            }
+            if (updateRequest.getDescription() != null) {
+                ticket.setDescription(updateRequest.getDescription());
+            }
+            if (updateRequest.getStatus() != null) {
+                ticket.setStatus(updateRequest.getStatus());
+            }
+            if (updateRequest.getPriority() != null) {
+                ticket.setPriority(updateRequest.getPriority());
+            }
+            if (updateRequest.getCategory() != null) {
+                ticket.setCategory(updateRequest.getCategory());
+            }
+            if (updateRequest.getAssignee() != null && !updateRequest.getAssignee().isEmpty()) {
+                Optional<UserEntity> user = userRepository.findByEmail(updateRequest.getAssignee());
+                user.ifPresent(ticket::setAssignedTo);
+            } else if (updateRequest.getAssignee() != null && updateRequest.getAssignee().isEmpty()) {
+                ticket.setAssignedTo(null);
+            }
+            if (updateRequest.getStatus() != null) {
+                ticket.setWorkflowStage(determineWorkflowStage(updateRequest.getStatus()));
+            }
+            if (updateRequest.getPriority() != null) {
+                ticket.setFirstResponseDueAt(calculateFirstResponseDueAt(updateRequest.getPriority()));
+                ticket.setResolutionDueAt(calculateResolutionDueAt(updateRequest.getPriority()));
+            }
+            if (ticket.getAssignedTo() != null && ticket.getRoutedDepartmentName() == null && ticket.getAssignedTo().getDepartment() != null) {
+                ticket.setRoutedDepartmentName(ticket.getAssignedTo().getDepartment().getName());
+            }
+            ticketRepository.save(ticket);
+            
+            // Notify about status change
+            if (updateRequest.getStatus() != null && !updateRequest.getStatus().equals(oldStatus)) {
+                if (ticket.getCreatedBy() != null) {
+                    notificationService.createNotification(
+                        NotificationType.TICKET_STATUS_CHANGED,
+                        "Statut du ticket modifié",
+                        "Le ticket '" + ticket.getTitle() + "' a été déplacé vers " + updateRequest.getStatus(),
+                        ticket.getCreatedBy(),
+                        ticket.getProject() != null ? ticket.getProject().getDepartment() : null,
+                        ticket.getId()
+                    );
+                }
+            }
+            
+             // Notify about assignment
+             if (ticket.getAssignedTo() != null && !ticket.getAssignedTo().equals(oldAssignee)) {
+                 notificationService.createNotification(
+                     NotificationType.TICKET_ASSIGNED,
+                     "Ticket vous a été assigné",
+                     "Le ticket '" + ticket.getTitle() + "' vous a été assigné",
+                     ticket.getAssignedTo(),
+                     ticket.getProject() != null ? ticket.getProject().getDepartment() : null,
+                     ticket.getId()
+                 );
+                 
+                 // Also send email notification
+                 try {
+                     emailService.sendTicketAssignedNotification(ticket, ticket.getAssignedTo());
+                 } catch (Exception e) {
+                     log.error("Error sending assignment email for ticket {}: {}", ticket.getId(), e.getMessage());
+                 }
+             }
+            
+            // If modifier is SUPPORT, notify admins and assigned support AND the reporter
+            if (updateRequest.getModifierEmail() != null && "SUPPORT".equals(updateRequest.getModifierRole())) {
+                UserEntity modifier = userRepository.findByEmail(updateRequest.getModifierEmail()).orElse(null);
+                if (modifier != null && modifier.getRole() == Role.SUPPORT) {
+                    // Build action description
+                    StringBuilder actionDescription = new StringBuilder();
+                    if (updateRequest.getStatus() != null && !updateRequest.getStatus().equals(oldStatus)) {
+                        actionDescription.append("Statut changé: ").append(updateRequest.getStatus());
+                    }
+                    if (updateRequest.getPriority() != null) {
+                        if (actionDescription.length() > 0) actionDescription.append(", ");
+                        actionDescription.append("Priorité: ").append(updateRequest.getPriority());
+                    }
+                    if (updateRequest.getDescription() != null) {
+                        if (actionDescription.length() > 0) actionDescription.append(", ");
+                        actionDescription.append("Description modifiée");
+                    }
+                    if (actionDescription.length() == 0) {
+                        actionDescription.append("Modifications générales");
+                    }
+                    
+                    // Notify admins and assigned support
+                    notifyAdminsAndAssignedSupport(ticket, modifier, actionDescription.toString());
+                    
+                    // Notify the reporter (ticket creator) about the modification
+                    notifyReporterOnSupportModification(ticket, modifier, actionDescription.toString());
+                }
+            }
+            
+            // If modifier is the REPORTER (createdBy), notify assigned user
+            if (updateRequest.getModifierEmail() != null && ticket.getCreatedBy() != null) {
+                String reporterEmail = ticket.getCreatedBy().getEmail();
+                if (reporterEmail != null && reporterEmail.equals(updateRequest.getModifierEmail())) {
+                    // Build action description
+                    StringBuilder actionDescription = new StringBuilder();
+                    if (updateRequest.getStatus() != null && !updateRequest.getStatus().equals(oldStatus)) {
+                        actionDescription.append("Statut changé: ").append(updateRequest.getStatus());
+                    }
+                    if (updateRequest.getPriority() != null) {
+                        if (actionDescription.length() > 0) actionDescription.append(", ");
+                        actionDescription.append("Priorité: ").append(updateRequest.getPriority());
+                    }
+                    if (updateRequest.getDescription() != null) {
+                        if (actionDescription.length() > 0) actionDescription.append(", ");
+                        actionDescription.append("Description modifiée");
+                    }
+                    if (updateRequest.getTitle() != null && !updateRequest.getTitle().isEmpty()) {
+                        if (actionDescription.length() > 0) actionDescription.append(", ");
+                        actionDescription.append("Titre modifié");
+                    }
+                    if (actionDescription.length() == 0) {
+                        actionDescription.append("Modifications générales");
+                    }
+                    
+                    notifyAssignedOnReporterModification(ticket, ticket.getCreatedBy(), actionDescription.toString());
+                }
+            }
+            
+            return ResponseEntity.ok(getTicketResponse(ticket));
+        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @Transactional
+    public void deleteTicket(Long id) {
+        // Physical deletion - permanently remove from database
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+        if (optionalTicket.isPresent()) {
+            Ticket ticket = optionalTicket.get();
+            ticketRepository.delete(ticket);
+            log.info("Ticket {} permanently deleted", id);
+        }
+    }
+
+    public void assignTicket(Long ticketId, AssignRequest assignRequest) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(ticketId);
+        if (optionalTicket.isEmpty()) {
+            return;
+        }
+        Ticket ticket = optionalTicket.get();
+        UserEntity oldAssignee = ticket.getAssignedTo();
+        
+        if (assignRequest.getEmail().isEmpty()) {
+            ticket.setAssignedTo(null);
+            ticketRepository.save(ticket);
+            return;
+        }
+        Optional<UserEntity> user = userRepository.findByEmail(assignRequest.getEmail());
+        if (user.isEmpty()) {
+            return;
+        }
+        
+        UserEntity newAssignee = user.get();
+        ticket.setAssignedTo(newAssignee);
+        ticketRepository.save(ticket);
+        
+        // Send email notification to new assignee
+        try {
+            emailService.sendTicketAssignedNotification(ticket, newAssignee);
+        } catch (Exception e) {
+            log.error("Error sending assignment email for ticket {}: {}", ticketId, e.getMessage());
+        }
+        
+        // Send notification through in-app system too
+        if (ticket.getProject() != null && ticket.getProject().getDepartment() != null) {
+            notificationService.createNotification(
+                NotificationType.TICKET_ASSIGNED,
+                "Ticket vous a été assigné",
+                "Le ticket '" + ticket.getTitle() + "' vous a été assigné",
+                newAssignee,
+                ticket.getProject().getDepartment(),
+                ticket.getId()
+            );
+        }
+    }
+
+    private TicketResponse getTicketResponse(Ticket ticket, List<Ticket> ticketList) {
+        List<SimilarTickets> similarTicketList = new ArrayList<>();
+        if (ticketList != null) {
+            for (Ticket ticket1 : ticketList) {
+                similarTicketList.add(SimilarTickets.builder()
+                        .id(ticket1.getId())
+                        .title(ticket1.getTitle()).build());
+            }
+        }
+        
+        CreatedByDto assignedTo = null;
+        if (ticket.getAssignedTo() != null) {
+            assignedTo = CreatedByDto.builder()
+                    .firstName(ticket.getAssignedTo().getFirstName())
+                    .lastName(ticket.getAssignedTo().getLastName())
+                    .email(ticket.getAssignedTo().getEmail())
+                    .build();
+        }
+        
+        List<CommentDto> commentDtos = null;
+        if (ticket.getComments() != null) {
+            commentDtos = commentService.commentList(ticket.getComments());
+        }
+        
+        // Attachments removed
+        
+        // Handle null createdBy (or use project as fallback)
+        CreatedByDto createdBy = null;
+        if (ticket.getCreatedBy() != null) {
+            createdBy = CreatedByDto.builder()
+                    .firstName(ticket.getCreatedBy().getFirstName())
+                    .lastName(ticket.getCreatedBy().getLastName())
+                    .email(ticket.getCreatedBy().getEmail())
+                    .build();
+        } else if (ticket.getProject() != null) {
+            // Fallback: use project info if no creator
+            createdBy = CreatedByDto.builder()
+                    .firstName("Unknown")
+                    .lastName("")
+                    .email("")
+                    .build();
+        }
+        
+        return TicketResponse.builder()
+                .id(ticket.getId())
+                .title(ticket.getTitle())
+                .description(ticket.getDescription())
+                .status(ticket.getStatus())
+                .priority(ticket.getPriority())
+                .category(ticket.getCategory())
+                .routedDepartmentName(ticket.getRoutedDepartmentName())
+                .routingReason(ticket.getRoutingReason())
+                .workflowStage(ticket.getWorkflowStage())
+                .firstResponseDueAt(ticket.getFirstResponseDueAt())
+                .resolutionDueAt(ticket.getResolutionDueAt())
+                .createdAt(ticket.getCreatedAt())
+                .modifiedAt(ticket.getModifiedAt())
+                .comments(commentDtos)
+                .created(createdBy)
+                .assigned(assignedTo)
+                .project(new ProjectDto(ticket.getProject()))
+                .similarTickets(similarTicketList)
+                .build();
+    }
+
+    private TicketResponse getTicketResponse(Ticket ticket) {
+        return getTicketResponse(ticket, null);
+    }
+
+    private UserEntity selectAssigneeForDepartment(Department department) {
+        if (department == null) {
+            return null;
+        }
+
+        return userRepository.findByDepartmentAndRole(department, Role.SUPPORT).stream()
+                .min(Comparator.comparingInt(this::countOpenAssignments))
+                .orElse(null);
+    }
+
+    private int countOpenAssignments(UserEntity user) {
+        if (user.getAssignedTickets() == null) {
+            return 0;
+        }
+        return (int) user.getAssignedTickets().stream()
+                .filter(ticket -> ticket.getStatus() != Status.Done && ticket.getStatus() != Status.Closed && ticket.getStatus() != Status.Deleted)
+                .count();
+    }
+
+    private String determineWorkflowStage(Status status) {
+        if (status == null) {
+            return "TRIAGE";
+        }
+        return switch (status) {
+            case Open -> "TRIAGE";
+            case ToDo -> "QUEUED";
+            case InProgress -> "IN_PROGRESS";
+            case WaitingForUserResponse -> "WAITING_FOR_USER";
+            case Done -> "READY_FOR_CLOSURE";
+            case Closed -> "CLOSED";
+            case Deleted -> "CANCELLED";
+        };
+    }
+
+    private LocalDateTime calculateFirstResponseDueAt(Priority priority) {
+        LocalDateTime now = LocalDateTime.now();
+        if (priority == null) {
+            return now.plusHours(8);
+        }
+        return switch (priority) {
+            case Critical -> now.plusHours(1);
+            case High -> now.plusHours(4);
+            case Medium -> now.plusHours(8);
+            case Low -> now.plusHours(24);
+        };
+    }
+
+    private LocalDateTime calculateResolutionDueAt(Priority priority) {
+        LocalDateTime now = LocalDateTime.now();
+        if (priority == null) {
+            return now.plusDays(3);
+        }
+        return switch (priority) {
+            case Critical -> now.plusHours(8);
+            case High -> now.plusDays(1);
+            case Medium -> now.plusDays(3);
+            case Low -> now.plusDays(5);
+        };
+    }
+    
+    // mapAttachmentToDto removed - attachments functionality removed
+
+    @Transactional
+    public ResponseEntity<Page<TicketResponse>> getAllTicketByProjectId(Long pid, Pageable pageable, String search) {
+        List<TicketResponse> ticketResponses;
+        long totalElements;
+        
+        if (search != null && !search.isBlank()) {
+            // Use search method from repository
+            Page<Ticket> searchPage = ticketRepository.findByProjectIdAndTitleContainingIgnoreCase(pid, search, pageable);
+            ticketResponses = new ArrayList<>();
+            for (Ticket ticket : searchPage.getContent()) {
+                ticketResponses.add(getTicketResponse(ticket));
+            }
+            return ResponseEntity.ok(new PageImpl<>(ticketResponses, pageable, searchPage.getTotalElements()));
+        } else {
+            List<Ticket> tickets = ticketRepository.findAllByProjectId(pid);
+            totalElements = tickets.size();
+            
+            // Apply pagination manually since we're working with a list
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), tickets.size());
+            List<Ticket> paginatedTickets = tickets.subList(start, end);
+            
+            ticketResponses = new ArrayList<>();
+            for (Ticket ticket : paginatedTickets) {
+                ticketResponses.add(getTicketResponse(ticket));
+            }
+        }
+        return ResponseEntity.ok(new PageImpl<>(ticketResponses, pageable, totalElements));
+    }
+
+    @Transactional
+    public ResponseEntity<Page<TicketResponse>> getAllTicketByProjectIdForUser(Long pid, String userEmail, String userRole, Long userDepartmentId, Pageable pageable, String search) {
+        List<Ticket> tickets;
+        
+        if ("ADMIN".equals(userRole)) {
+            // Admin sees all tickets in the project
+            // If admin has no department, they see all tickets in the project regardless of department
+            tickets = ticketRepository.findAllByProjectId(pid);
+            // Only filter by department if the admin has a department assigned
+            if (userDepartmentId != null) {
+                tickets = tickets.stream()
+                    .filter(t -> t.getProject() != null && 
+                                 t.getProject().getDepartment() != null && 
+                                 t.getProject().getDepartment().getId().equals(userDepartmentId))
+                    .collect(Collectors.toList());
+            }
+        } else if ("SUPPORT".equals(userRole)) {
+            // Support sees only tickets assigned to them or created by them within the project
+            tickets = ticketRepository.findAllByProjectId(pid);
+            List<Ticket> filteredTickets = new ArrayList<>();
+            for (Ticket ticket : tickets) {
+                // Check if ticket is assigned to user or created by user
+                boolean isAssignedToUser = ticket.getAssignedTo() != null && ticket.getAssignedTo().getEmail().equals(userEmail);
+                boolean isCreatedByUser = ticket.getCreatedBy() != null && ticket.getCreatedBy().getEmail().equals(userEmail);
+                
+                if (isAssignedToUser || isCreatedByUser) {
+                    filteredTickets.add(ticket);
+                }
+            }
+            tickets = filteredTickets;
+        } else {
+            // Regular user sees only their own tickets (created or assigned) within the project
+            tickets = ticketRepository.findAllByProjectId(pid);
+            List<Ticket> filteredTickets = new ArrayList<>();
+            for (Ticket ticket : tickets) {
+                boolean isAssignedToUser = ticket.getAssignedTo() != null && ticket.getAssignedTo().getEmail().equals(userEmail);
+                boolean isCreatedByUser = ticket.getCreatedBy() != null && ticket.getCreatedBy().getEmail().equals(userEmail);
+                
+                if (isAssignedToUser || isCreatedByUser) {
+                    filteredTickets.add(ticket);
+                }
+            }
+            tickets = filteredTickets;
+        }
+        
+        // Filter by search term if provided
+        if (search != null && !search.isBlank()) {
+            final String searchLower = search.toLowerCase();
+            tickets = tickets.stream()
+                .filter(t -> (t.getTitle() != null && t.getTitle().toLowerCase().contains(searchLower)) ||
+                             (t.getDescription() != null && t.getDescription().toLowerCase().contains(searchLower)))
+                .collect(Collectors.toList());
+        }
+        
+        // Apply pagination manually since we're working with a list
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), tickets.size());
+        List<Ticket> paginatedTickets = tickets.subList(start, end);
+        
+        List<TicketResponse> ticketResponses = new ArrayList<>();
+        for (Ticket ticket : paginatedTickets) {
+            ticketResponses.add(getTicketResponse(ticket));
+        }
+        return ResponseEntity.ok(new PageImpl<>(ticketResponses, pageable, tickets.size()));
+    }
+
+    public ResponseEntity<TicketResponse> getTicketByProjectId(Long pid, Long tid) {
+        Optional<Ticket> optionalTicket = ticketRepository.findByProjectIdAndId(pid, tid);
+        if (optionalTicket.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Ticket ticket = optionalTicket.get();
+        return ResponseEntity.ok(getTicketResponse(ticket));
+    }
+
+    // Get all tickets for a specific user (created by or assigned to)
+    public ResponseEntity<Page<TicketResponse>> getTicketsByUserEmail(String email, Pageable pageable, String search) {
+        List<Ticket> tickets = ticketRepository.findByCreatedByEmailOrAssignedToEmail(email, email);
+        
+        // Filter by search term if provided
+        if (search != null && !search.isBlank()) {
+            final String searchLower = search.toLowerCase();
+            tickets = tickets.stream()
+                .filter(t -> (t.getTitle() != null && t.getTitle().toLowerCase().contains(searchLower)) ||
+                             (t.getDescription() != null && t.getDescription().toLowerCase().contains(searchLower)))
+                .collect(Collectors.toList());
+        }
+        
+        // Apply pagination manually since we're working with a list
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), tickets.size());
+        List<Ticket> paginatedTickets = tickets.subList(start, end);
+        
+        List<TicketResponse> ticketResponses = new ArrayList<>();
+        for (Ticket ticket : paginatedTickets) {
+            ticketResponses.add(getTicketResponse(ticket));
+        }
+        return ResponseEntity.ok(new PageImpl<>(ticketResponses, pageable, tickets.size()));
+    }
+
+    // Get tickets based on user role and department (for role-based visibility)
+    public ResponseEntity<Page<TicketResponse>> getTicketsForUser(String email, String role, Long departmentId, Pageable pageable, String search) {
+        List<Ticket> tickets;
+        
+        if ("ADMIN".equals(role)) {
+            if (departmentId == null) {
+                // Admin without department sees ALL tickets
+                tickets = ticketRepository.findAll();
+            } else {
+                // Admin with department sees tickets from their department only
+                tickets = ticketRepository.findByProjectDepartmentId(departmentId);
+            }
+        } else if ("SUPPORT".equals(role) && departmentId != null) {
+            // Support sees tickets from their department
+            // Get all users in the department
+            List<UserEntity> departmentUsers = userRepository.findAll().stream()
+                .filter(u -> u.getDepartment() != null && u.getDepartment().getId().equals(departmentId))
+                .collect(Collectors.toList());
+            
+            // Get all project IDs for the department
+            List<Long> projectIds = projectRepository.findAll().stream()
+                .filter(p -> p.getDepartment() != null && p.getDepartment().getId().equals(departmentId))
+                .map(Project::getId)
+                .collect(Collectors.toList());
+            
+            // Get tickets from these projects
+            List<Ticket> projectTickets = new ArrayList<>();
+            for (Long projectId : projectIds) {
+                projectTickets.addAll(ticketRepository.findAllByProjectId(projectId));
+            }
+            
+            // Get tickets created by or assigned to users in this department
+            List<Ticket> userTickets = new ArrayList<>();
+            for (UserEntity user : departmentUsers) {
+                userTickets.addAll(ticketRepository.findByCreatedByEmailOrAssignedToEmail(user.getEmail(), user.getEmail()));
+            }
+            
+            // Combine and deduplicate
+            tickets = new ArrayList<>();
+            tickets.addAll(projectTickets);
+            for (Ticket t : userTickets) {
+                if (!tickets.contains(t)) {
+                    tickets.add(t);
+                }
+            }
+        } else {
+            // Regular user sees only their own tickets (created or assigned)
+            tickets = ticketRepository.findByCreatedByEmailOrAssignedToEmail(email, email);
+        }
+        
+        // Filter by search term if provided
+        if (search != null && !search.isBlank()) {
+            final String searchLower = search.toLowerCase();
+            tickets = tickets.stream()
+                .filter(t -> (t.getTitle() != null && t.getTitle().toLowerCase().contains(searchLower)) ||
+                             (t.getDescription() != null && t.getDescription().toLowerCase().contains(searchLower)))
+                .collect(Collectors.toList());
+        }
+        
+        // Apply pagination manually since we're working with a list
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), tickets.size());
+        List<Ticket> paginatedTickets = tickets.subList(start, end);
+        
+        List<TicketResponse> ticketResponses = new ArrayList<>();
+        for (Ticket ticket : paginatedTickets) {
+            ticketResponses.add(getTicketResponse(ticket));
+        }
+        return ResponseEntity.ok(new PageImpl<>(ticketResponses, pageable, tickets.size()));
+    }
+
+    // ==================== ADVANCED SEARCH ====================
+
+    public ResponseEntity<Page<TicketResponse>> searchTickets(
+            Pageable pageable,
+            String search,
+            List<Status> statuses,
+            List<Priority> priorities,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Long departmentId,
+            Long projectId,
+            String category) {
+        
+        List<Ticket> tickets = ticketRepository.findAll();
+        
+        // Filter by search term
+        if (search != null && !search.isBlank()) {
+            final String searchLower = search.toLowerCase();
+            tickets = tickets.stream()
+                .filter(t -> (t.getTitle() != null && t.getTitle().toLowerCase().contains(searchLower)) ||
+                             (t.getDescription() != null && t.getDescription().toLowerCase().contains(searchLower)))
+                .collect(Collectors.toList());
+        }
+        
+        // Filter by statuses
+        if (statuses != null && !statuses.isEmpty()) {
+            tickets = tickets.stream()
+                .filter(t -> statuses.contains(t.getStatus()))
+                .collect(Collectors.toList());
+        }
+        
+        // Filter by priorities
+        if (priorities != null && !priorities.isEmpty()) {
+            tickets = tickets.stream()
+                .filter(t -> priorities.contains(t.getPriority()))
+                .collect(Collectors.toList());
+        }
+        
+        // Filter by date range
+        if (startDate != null && endDate != null) {
+            tickets = tickets.stream()
+                .filter(t -> !t.getCreatedAt().isBefore(startDate) && !t.getCreatedAt().isAfter(endDate))
+                .collect(Collectors.toList());
+        } else if (startDate != null) {
+            tickets = tickets.stream()
+                .filter(t -> !t.getCreatedAt().isBefore(startDate))
+                .collect(Collectors.toList());
+        } else if (endDate != null) {
+            tickets = tickets.stream()
+                .filter(t -> !t.getCreatedAt().isAfter(endDate))
+                .collect(Collectors.toList());
+        }
+        
+        // Filter by department
+        if (departmentId != null) {
+            tickets = tickets.stream()
+                .filter(t -> t.getProject() != null && 
+                             t.getProject().getDepartment() != null && 
+                             t.getProject().getDepartment().getId().equals(departmentId))
+                .collect(Collectors.toList());
+        }
+        
+        // Filter by project
+        if (projectId != null) {
+            tickets = tickets.stream()
+                .filter(t -> t.getProject() != null && t.getProject().getId().equals(projectId))
+                .collect(Collectors.toList());
+        }
+        
+        // Filter by category
+        if (category != null && !category.isBlank()) {
+            tickets = tickets.stream()
+                .filter(t -> category.equalsIgnoreCase(t.getCategory()))
+                .collect(Collectors.toList());
+        }
+        
+        // Apply pagination
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), tickets.size());
+        List<Ticket> paginatedTickets = tickets.subList(start, end);
+        
+        List<TicketResponse> ticketResponses = new ArrayList<>();
+        for (Ticket ticket : paginatedTickets) {
+            ticketResponses.add(getTicketResponse(ticket));
+        }
+        return ResponseEntity.ok(new PageImpl<>(ticketResponses, pageable, tickets.size()));
+    }
+
+    // ==================== BULK ACTIONS ====================
+
+    @Transactional
+    public void bulkDeleteTickets(List<Long> ticketIds) {
+        if (ticketIds == null || ticketIds.isEmpty()) {
+            return;
+        }
+        // Physical deletion - permanently remove from database
+        ticketRepository.deleteByIdIn(ticketIds);
+        log.info("Permanently deleted {} tickets", ticketIds.size());
+    }
+
+    @Transactional
+    public void bulkAssignTickets(List<Long> ticketIds, String assigneeEmail) {
+        if (ticketIds == null || ticketIds.isEmpty() || assigneeEmail == null || assigneeEmail.isBlank()) {
+            return;
+        }
+        // Verify user exists
+        if (userRepository.findByEmail(assigneeEmail).isEmpty()) {
+            throw new IllegalArgumentException("User not found with email: " + assigneeEmail);
+        }
+        ticketRepository.assignByIdIn(ticketIds, assigneeEmail);
+        log.info("Bulk assigned {} tickets to {}", ticketIds.size(), assigneeEmail);
+    }
+
+    // ==================== KANBAN VIEW ====================
+
+    public ResponseEntity<?> getKanbanTickets(Long projectId, Long departmentId) {
+        List<Ticket> tickets = ticketRepository.findAll();
+        
+        // Filter by project if specified
+        if (projectId != null) {
+            tickets = tickets.stream()
+                .filter(t -> t.getProject() != null && t.getProject().getId().equals(projectId))
+                .collect(Collectors.toList());
+        }
+        
+        // Filter by department if specified
+        if (departmentId != null) {
+            tickets = tickets.stream()
+                .filter(t -> t.getProject() != null && 
+                             t.getProject().getDepartment() != null && 
+                             t.getProject().getDepartment().getId().equals(departmentId))
+                .collect(Collectors.toList());
+        }
+        
+        // Exclude deleted tickets
+        tickets = tickets.stream()
+            .filter(t -> t.getStatus() != Status.Deleted)
+            .collect(Collectors.toList());
+        
+        // Group by status
+        Map<Status, List<Ticket>> groupedTickets = tickets.stream()
+            .collect(Collectors.groupingBy(Ticket::getStatus));
+        
+        // Create response with columns for each status
+        Map<String, Object> response = new HashMap<>();
+        for (Status status : Status.values()) {
+            if (status != Status.Deleted) {
+                List<Ticket> statusTickets = groupedTickets.getOrDefault(status, new ArrayList<>());
+                List<TicketResponse> ticketResponses = statusTickets.stream()
+                    .map(this::getTicketResponse)
+                    .collect(Collectors.toList());
+                response.put(status.name(), ticketResponses);
+            }
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+}

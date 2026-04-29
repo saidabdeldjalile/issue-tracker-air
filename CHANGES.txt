@@ -1,0 +1,35 @@
+CHANGES MADE TO FIX BUGS
+=========================
+
+1. chatbot-service/app.py
+   ----------------------
+   Line 182: Fixed indentation error in FAQ result handling
+     - Changed: "if faq_result.get('found'):\n            response_text"
+     - To: "if faq_result.get('found'):\n        response_text"
+   
+   Line 244: Fixed indentation error in ticket status display
+     - Changed: "response_text = f"Ticket #{ticket_id}..." (13 spaces)
+     - To: "response_text = f"Ticket #{ticket_id}..." (12 spaces)
+   
+   Line 246: Fixed indentation error in status check
+     - Changed: "if status in ['Done', 'Closed']:" (13 spaces)
+     - To: "if status in ['Done', 'Closed']:" (12 spaces)
+
+2. ai-service/actions_server.py
+   ------------------------------
+   Line 17: Fixed self-referencing variable
+     - Changed: "TICKET_API = f"{TICKET_API}/tickets""
+     - To: "TICKET_API = f"{BACKEND_URL}/tickets""
+
+VERIFICATION
+============
+All Python files pass syntax validation (ast.parse).
+All indentation errors fixed.
+All variable reference errors fixed.
+
+NOTES
+=====
+- The ai-service/app.py (Rasa-based service) is the main production service
+- It properly handles the feedback flow (no direct ticket creation)
+- The chatbot-service is a legacy simple service (not used in Docker deploy)
+- The Docker Compose deploys "ai-chatbot" using ai-service/app.py

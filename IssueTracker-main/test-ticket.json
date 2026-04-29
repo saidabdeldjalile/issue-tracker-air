@@ -1,0 +1,10 @@
+{
+  "title": "Test ticket creation via API",
+  "description": "This is a test ticket to verify the creation endpoint works correctly.",
+  "project": 1,
+"reporter": "saidabddjalile123@gmail.com",
+"assignee": "saidabddjalile123@gmail.com",
+  "priority": "Medium",
+  "status": "Open",
+  "category": "Test"
+}

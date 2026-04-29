@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- ==================== ENUM TABLES NOT NEEDED - Java Enums stored as VARCHAR ==================== -->
+
+    <!-- ==================== DEPARTMENT ==================== -->
+    <changeSet id="001-create-department" author="liquibase">
+        <createTable tableName="department">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+    <!-- ==================== USER (_user) ==================== -->
+    <changeSet id="002-create-user" author="liquibase">
+        <createTable tableName="_user">
+            <column name="id" type="INTEGER">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(100)"/>
+            <column name="last_name" type="VARCHAR(100)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="role" type="VARCHAR(50)"/>
+            <column name="registration_number" type="VARCHAR(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="department_id" type="BIGINT"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="_user"
+                baseColumnNames="department_id"
+                constraintName="fk_user_department"
+                referencedTableName="department"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- ==================== PROJECT ==================== -->
+    <changeSet id="003-create-project" author="liquibase">
+        <createTable tableName="project">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="project"
+                baseColumnNames="department_id"
+                constraintName="fk_project_department"
+                referencedTableName="department"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- ==================== TICKET ==================== -->
+    <changeSet id="004-create-ticket" author="liquibase">
+        <createTable tableName="ticket">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="status" type="VARCHAR(50)"/>
+            <column name="priority" type="VARCHAR(50)"/>
+            <column name="category" type="VARCHAR(100)"/>
+            <column name="vector" type="TEXT"/>
+            <column name="routed_department_name" type="VARCHAR(100)"/>
+            <column name="routing_reason" type="TEXT"/>
+            <column name="workflow_stage" type="VARCHAR(100)"/>
+            <column name="first_response_due_at" type="TIMESTAMP"/>
+            <column name="resolution_due_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="modified_at" type="TIMESTAMP"/>
+            <column name="created_by_id" type="INTEGER"/>
+            <column name="assigned_to_id" type="INTEGER"/>
+            <column name="project_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="ticket"
+                baseColumnNames="created_by_id"
+                constraintName="fk_ticket_created_by"
+                referencedTableName="_user"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="ticket"
+                baseColumnNames="assigned_to_id"
+                constraintName="fk_ticket_assigned_to"
+                referencedTableName="_user"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="ticket"
+                baseColumnNames="project_id"
+                constraintName="fk_ticket_project"
+                referencedTableName="project"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- ==================== COMMENT ==================== -->
+    <changeSet id="005-create-comment" author="liquibase">
+        <createTable tableName="comment">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="comment" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="created_by_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ticket_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="comment"
+                baseColumnNames="created_by_id"
+                constraintName="fk_comment_created_by"
+                referencedTableName="_user"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="comment"
+                baseColumnNames="ticket_id"
+                constraintName="fk_comment_ticket"
+                referencedTableName="ticket"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- ==================== SCREENSHOT ==================== -->
+    <changeSet id="006-create-screenshot" author="liquibase">
+        <createTable tableName="screenshot">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="image_url" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_size" type="BIGINT"/>
+            <column name="mime_type" type="VARCHAR(100)"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="ticket_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uploaded_by_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="screenshot"
+                baseColumnNames="ticket_id"
+                constraintName="fk_screenshot_ticket"
+                referencedTableName="ticket"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="screenshot"
+                baseColumnNames="uploaded_by_id"
+                constraintName="fk_screenshot_uploaded_by"
+                referencedTableName="_user"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- ==================== COMMENT_SCREENSHOT ==================== -->
+    <changeSet id="007-create-commentscreenshot" author="liquibase">
+        <createTable tableName="commentscreenshot">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="image_url" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_size" type="BIGINT"/>
+            <column name="mime_type" type="VARCHAR(100)"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="comment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uploaded_by_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="commentscreenshot"
+                baseColumnNames="comment_id"
+                constraintName="fk_commentscreenshot_comment"
+                referencedTableName="comment"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="commentscreenshot"
+                baseColumnNames="uploaded_by_id"
+                constraintName="fk_commentscreenshot_uploaded_by"
+                referencedTableName="_user"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- ==================== NOTIFICATION ==================== -->
+    <changeSet id="008-create-notification" author="liquibase">
+        <createTable tableName="notification">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)"/>
+            <column name="message" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_read" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="user_id" type="INTEGER"/>
+            <column name="department_id" type="BIGINT"/>
+            <column name="related_entity_id" type="BIGINT"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="notification"
+                baseColumnNames="user_id"
+                constraintName="fk_notification_user"
+                referencedTableName="_user"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="notification"
+                baseColumnNames="department_id"
+                constraintName="fk_notification_department"
+                referencedTableName="department"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- ==================== FAQ ==================== -->
+    <changeSet id="009-create-faq" author="liquibase">
+        <createTable tableName="faq">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="question" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="answer" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="VARCHAR(100)"/>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="view_count" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="modified_at" type="TIMESTAMP"/>
+            <column name="department_id" type="BIGINT"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="faq"
+                baseColumnNames="department_id"
+                constraintName="fk_faq_department"
+                referencedTableName="department"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- FAQ Keywords Element Collection -->
+    <changeSet id="010-create-faq-keywords" author="liquibase">
+        <createTable tableName="faq_keywords">
+            <column name="faq_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="keywords" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="faq_keywords"
+                columnNames="faq_id,keywords"
+                constraintName="uk_faq_keyword"/>
+
+        <addForeignKeyConstraint
+                baseTableName="faq_keywords"
+                baseColumnNames="faq_id"
+                constraintName="fk_faq_keywords_faq"
+                referencedTableName="faq"
+                referencedColumnNames="id"
+                deferrable="false"
+                initiallyDeferred="false"/>
+    </changeSet>
+
+    <!-- ==================== UNANSWERED_QUESTION ==================== -->
+    <changeSet id="011-create-unanswered-question" author="liquibase">
+        <createTable tableName="unanswered_question">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="question" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="context" type="TEXT"/>
+            <column name="user_email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="suggested_category" type="VARCHAR(100)"/>
+            <column name="suggested_department" type="VARCHAR(100)"/>
+            <column name="related_ticket_id" type="BIGINT"/>
+            <column name="status" type="VARCHAR(50)"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="resolved_at" type="TIMESTAMP"/>
+            <column name="resolved_by_faq_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+    <!-- ==================== PROCEDURE ==================== -->
+    <changeSet id="012-create-procedure" author="liquibase">
+        <createTable tableName="procedure">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="VARCHAR(100)"/>
+            <column name="description" type="TEXT"/>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="document_path" type="VARCHAR(500)"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="modified_at" type="TIMESTAMP"/>
+            <column name="department_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="procedure"
+                baseColumnNames="department_id"
+                constraintName="fk_procedure_department"
+                referencedTableName="department"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- ==================== VECTOR_TABLE ==================== -->
+    <changeSet id="013-create-vector-table" author="liquibase">
+        <createTable tableName="vector_table">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ticket_id" type="BIGINT"/>
+            <column name="project_id" type="BIGINT"/>
+            <column name="vector" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+    <!-- ==================== INDEXES ==================== -->
+    <changeSet id="014-create-indexes" author="liquibase">
+        <!-- Ticket indexes -->
+        <createIndex indexName="idx_ticket_status" tableName="ticket">
+            <column name="status"/>
+        </createIndex>
+        <createIndex indexName="idx_ticket_created_by" tableName="ticket">
+            <column name="created_by_id"/>
+        </createIndex>
+        <createIndex indexName="idx_ticket_assigned_to" tableName="ticket">
+            <column name="assigned_to_id"/>
+        </createIndex>
+        <createIndex indexName="idx_ticket_project" tableName="ticket">
+            <column name="project_id"/>
+        </createIndex>
+        <createIndex indexName="idx_ticket_created_at" tableName="ticket">
+            <column name="created_at"/>
+        </createIndex>
+        <createIndex indexName="idx_ticket_category" tableName="ticket">
+            <column name="category"/>
+        </createIndex>
+
+        <!-- Comment indexes -->
+        <createIndex indexName="idx_comment_ticket" tableName="comment">
+            <column name="ticket_id"/>
+        </createIndex>
+        <createIndex indexName="idx_comment_created_by" tableName="comment">
+            <column name="created_by_id"/>
+        </createIndex>
+
+        <!-- Notification indexes -->
+        <createIndex indexName="idx_notification_user" tableName="notification">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex indexName="idx_notification_department" tableName="notification">
+            <column name="department_id"/>
+        </createIndex>
+        <createIndex indexName="idx_notification_is_read" tableName="notification">
+            <column name="is_read"/>
+        </createIndex>
+
+        <!-- FAQ indexes -->
+        <createIndex indexName="idx_faq_department" tableName="faq">
+            <column name="department_id"/>
+        </createIndex>
+        <createIndex indexName="idx_faq_category" tableName="faq">
+            <column name="category"/>
+        </createIndex>
+        <createIndex indexName="idx_faq_active" tableName="faq">
+            <column name="active"/>
+        </createIndex>
+
+        <!-- Procedure indexes -->
+        <createIndex indexName="idx_procedure_department" tableName="procedure">
+            <column name="department_id"/>
+        </createIndex>
+        <createIndex indexName="idx_procedure_category" tableName="procedure">
+            <column name="category"/>
+        </createIndex>
+        <createIndex indexName="idx_procedure_active" tableName="procedure">
+            <column name="active"/>
+        </createIndex>
+
+        <!-- UnansweredQuestion indexes -->
+        <createIndex indexName="idx_unanswered_user_email" tableName="unanswered_question">
+            <column name="user_email"/>
+        </createIndex>
+        <createIndex indexName="idx_unanswered_status" tableName="unanswered_question">
+            <column name="status"/>
+        </createIndex>
+
+        <!-- User indexes -->
+        <createIndex indexName="idx_user_email" tableName="_user">
+            <column name="email"/>
+        </createIndex>
+        <createIndex indexName="idx_user_department" tableName="_user">
+            <column name="department_id"/>
+        </createIndex>
+        <createIndex indexName="idx_user_role" tableName="_user">
+            <column name="role"/>
+        </createIndex>
+
+        <!-- Project indexes -->
+        <createIndex indexName="idx_project_department" tableName="project">
+            <column name="department_id"/>
+        </createIndex>
+
+        <!-- Screenshot indexes -->
+        <createIndex indexName="idx_screenshot_ticket" tableName="screenshot">
+            <column name="ticket_id"/>
+        </createIndex>
+        <createIndex indexName="idx_screenshot_uploaded_by" tableName="screenshot">
+            <column name="uploaded_by_id"/>
+        </createIndex>
+
+        <!-- CommentScreenshot indexes -->
+        <createIndex indexName="idx_commentscreenshot_comment" tableName="commentscreenshot">
+            <column name="comment_id"/>
+        </createIndex>
+
+        <!-- VectorTable indexes -->
+        <createIndex indexName="idx_vector_ticket" tableName="vector_table">
+            <column name="ticket_id"/>
+        </createIndex>
+        <createIndex indexName="idx_vector_project" tableName="vector_table">
+            <column name="project_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,8 @@
+transformers
+sentence-transformers
+flask
+beautifulsoup4
+flask-cors
+waitress
+nltk
+lxml
