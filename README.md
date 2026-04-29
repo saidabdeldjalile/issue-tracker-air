@@ -443,16 +443,22 @@ VITE_API_URL=http://localhost:6969
 
 ```
 IssueTracker-main/
-├── src/                          # Backend Java/Spring Boot
+├── src/                          # Backend Java/Spring Boot (Maven)
+│   ├── main/java/.../            # Code source Java
+│   └── main/resources/           # Configuration et ressources
 ├── issue-tracker-web/           # Frontend React/TypeScript (Vite)
+│   ├── src/                      # Composants, Hooks, Contexts
+│   └── package.json              # Dépendances frontend
 ├── ai-service/                  # Service Rasa (Chatbot NLU + Actions)
+│   ├── data/                     # Données d'entraînement NLU/Stories
+│   └── domain.yml                # Définition du domaine Rasa
 ├── chatbot-service/             # Service complémentaire pour le Chatbot
-├── classification-service/      # Service IA de classification des tickets
+├── classification-service/      # Service IA de classification des tickets (Python)
 ├── duplicate-detection/         # Service Python de détection de doublons
 ├── uploads/                     # Dossier d'upload des screenshots
-├── pom.xml                      # Configuration Maven
-├── docker-compose.yml           # Configuration Docker
-├── start-platform.sh            # Script de démarrage unifié
+├── pom.xml                      # Fichier de build Maven racine
+├── docker-compose.yml           # Orchestration des services avec Docker
+├── start-platform.sh            # Script de démarrage global (Linux/Mac)
 └── README.md                    # Ce fichier
 ```
 
