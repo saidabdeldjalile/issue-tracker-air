@@ -48,15 +48,15 @@ function Loginform() {
       return;
     }
 
-    try {
-      const res = await axios.post(
-        `${config.authUrl}/api/auth/login`,
-        { email, password, rememberMe },
-        {
-          headers: { "Content-Type": "application/json" },
-          timeout: 10000,
-        }
-      );
+     try {
+       const res = await axios.post(
+         `${config.authUrl}/login`,
+         { email, password, rememberMe },
+         {
+           headers: { "Content-Type": "application/json" },
+           timeout: 10000,
+         }
+       );
 
       if (!res.data || !res.data.token) {
         throw new Error("Invalid response from server - missing token");
@@ -276,9 +276,9 @@ function Loginform() {
                     />
                     <span className="text-sm text-gray-600 dark:text-gray-400">Se souvenir de moi</span>
                   </label>
-                  <a href="#" className="text-sm font-semibold text-red-600 hover:text-red-700 transition-colors">
-                    Mot de passe oublié ?
-                  </a>
+<a href="/forgot-password" className="text-sm font-semibold text-red-600 hover:text-red-700 transition-colors">
+                     Mot de passe oublié ?
+                   </a>
                 </div>
 
                 {/* Submit Button */}

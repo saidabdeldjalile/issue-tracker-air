@@ -1,1 +1,4 @@
 dupenv/
+venv/
+__pycache__/
+*.pyc

@@ -10,6 +10,7 @@ import "./i18n";
 (window as any).global = window;
 
 // Enregistrement du Service Worker pour PWA
+/* 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
@@ -25,6 +26,7 @@ if ("serviceWorker" in navigator) {
       });
   });
 }
+*/
 
 // Handle AbortError from browser extensions/auto-play requests
 // This error occurs when play() is interrupted by pause() - commonly from browser extensions

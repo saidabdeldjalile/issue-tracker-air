@@ -111,74 +111,96 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
-      <section className="page-section overflow-hidden">
-        <div className="border-b border-base-300/60 bg-gradient-to-r from-blue-600/10 via-violet-600/10 to-cyan-500/10 p-6 md:p-8">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+    <div className="space-y-8 pb-10">
+      <section className="page-section overflow-hidden rounded-3xl border border-base-300/60 shadow-lg">
+        <div className="relative bg-gradient-to-r from-blue-600/10 via-violet-600/10 to-cyan-500/10 p-6 md:p-10 overflow-hidden">
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-primary/10 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-secondary/10 blur-3xl"></div>
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between relative z-10">
             <div>
-              <h1 className="section-heading">Dashboard d'Analyse</h1>
-              <p className="mt-2.5 max-w-2xl text-sm leading-6 text-base-content/65">
+              <div className="inline-flex items-center gap-2 rounded-full border border-base-300/70 bg-base-100/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-base-content/60 shadow-sm mb-4">
+                Overview
+              </div>
+              <h1 className="text-4xl font-black tracking-tight text-base-content">Dashboard d'Analyse</h1>
+              <p className="mt-3 max-w-2xl text-base leading-relaxed text-base-content/70">
                 Vue d'ensemble des métriques, analyses et visualisations des tickets et projets.
               </p>
             </div>
 
             {/* View Mode Tabs */}
-            <div className="tabs tabs-boxed">
-              <a
-                className={`tab ${viewMode === "stats" ? "tab-active" : ""}`}
+            <div className="bg-base-100/60 backdrop-blur-md p-1.5 rounded-2xl border border-base-300/50 flex gap-1 shadow-sm">
+              <button
+                className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${viewMode === "stats" ? "bg-base-100 shadow-md text-primary" : "text-base-content/60 hover:bg-base-200/50 hover:text-base-content"}`}
                 onClick={() => setViewMode("stats")}
               >
                 Stats & Charts
-              </a>
-              <a
-                className={`tab ${viewMode === "kanban" ? "tab-active" : ""}`}
+              </button>
+              <button
+                className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${viewMode === "kanban" ? "bg-base-100 shadow-md text-primary" : "text-base-content/60 hover:bg-base-200/50 hover:text-base-content"}`}
                 onClick={() => setViewMode("kanban")}
               >
                 Kanban
-              </a>
-              <a
-                className={`tab ${viewMode === "gantt" ? "tab-active" : ""}`}
+              </button>
+              <button
+                className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${viewMode === "gantt" ? "bg-base-100 shadow-md text-primary" : "text-base-content/60 hover:bg-base-200/50 hover:text-base-content"}`}
                 onClick={() => setViewMode("gantt")}
               >
                 Gantt
-              </a>
+              </button>
             </div>
           </div>
         </div>
 
-        <div className="p-6 md:p-8">
+        <div className="p-6 md:p-8 bg-base-100/40">
           <FilterPanel
             filters={filters}
             onFilterChange={handleFilterChange}
             onReset={handleReset}
           />
 
-          <div className="space-y-6">
+          <div className="space-y-8">
             {viewMode === "stats" && (
               <>
                 <StatsCards stats={data.stats} />
+                
                 {slaStats && (
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="overflow-hidden rounded-xl border border-base-300/60 bg-base-100/80 p-5 shadow-sm">
-                      <h3 className="text-sm font-medium text-base-content/70">Taux de Conformité SLA</h3>
-                      <p className={`text-2xl font-bold ${slaStats.complianceRate >= 90 ? "text-success" : slaStats.complianceRate >= 70 ? "text-warning" : "text-error"}`}>
-                        {slaStats.complianceRate.toFixed(1)}%
-                      </p>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mt-8 mb-8">
+                    <div className="relative overflow-hidden rounded-2xl border border-base-300/60 bg-base-100/80 p-6 shadow-sm backdrop-blur-xl group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-success/10 rounded-full blur-xl -mr-10 -mt-10 group-hover:bg-success/20 transition-colors"></div>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-2">Taux de Conformité SLA</h3>
+                      <div className="flex items-end gap-3">
+                        <p className={`text-4xl font-black tracking-tight ${slaStats.complianceRate >= 90 ? "text-success" : slaStats.complianceRate >= 70 ? "text-warning" : "text-error"}`}>
+                          {slaStats.complianceRate.toFixed(1)}%
+                        </p>
+                      </div>
                     </div>
-                    <div className="overflow-hidden rounded-xl border border-base-300/60 bg-base-100/80 p-5 shadow-sm">
-                      <h3 className="text-sm font-medium text-base-content/70">Tickets SLA Dépassé</h3>
-                      <p className="text-2xl font-bold text-error">{slaStats.breachedTickets}</p>
+                    
+                    <div className="relative overflow-hidden rounded-2xl border border-base-300/60 bg-base-100/80 p-6 shadow-sm backdrop-blur-xl group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-error/10 rounded-full blur-xl -mr-10 -mt-10 group-hover:bg-error/20 transition-colors"></div>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-2">Tickets SLA Dépassé</h3>
+                      <div className="flex items-end gap-3">
+                        <p className="text-4xl font-black tracking-tight text-error">{slaStats.breachedTickets}</p>
+                      </div>
                     </div>
-                    <div className="overflow-hidden rounded-xl border border-base-300/60 bg-base-100/80 p-5 shadow-sm">
-                      <h3 className="text-sm font-medium text-base-content/70">Tickets à Risque</h3>
-                      <p className="text-2xl font-bold text-warning">{slaStats.atRiskTickets}</p>
+                    
+                    <div className="relative overflow-hidden rounded-2xl border border-base-300/60 bg-base-100/80 p-6 shadow-sm backdrop-blur-xl group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-warning/10 rounded-full blur-xl -mr-10 -mt-10 group-hover:bg-warning/20 transition-colors"></div>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-2">Tickets à Risque</h3>
+                      <div className="flex items-end gap-3">
+                        <p className="text-4xl font-black tracking-tight text-warning">{slaStats.atRiskTickets}</p>
+                      </div>
                     </div>
-                    <div className="overflow-hidden rounded-xl border border-base-300/60 bg-base-100/80 p-5 shadow-sm">
-                      <h3 className="text-sm font-medium text-base-content/70">Résolus dans les Temps</h3>
-                      <p className="text-2xl font-bold text-success">{slaStats.resolvedOnTime}</p>
+                    
+                    <div className="relative overflow-hidden rounded-2xl border border-base-300/60 bg-base-100/80 p-6 shadow-sm backdrop-blur-xl group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-success/10 rounded-full blur-xl -mr-10 -mt-10 group-hover:bg-success/20 transition-colors"></div>
+                      <h3 className="text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-2">Résolus dans les Temps</h3>
+                      <div className="flex items-end gap-3">
+                        <p className="text-4xl font-black tracking-tight text-success">{slaStats.resolvedOnTime}</p>
+                      </div>
                     </div>
                   </div>
                 )}
+                
                 <Charts
                   statusDistribution={data.statusDistribution}
                   departmentStats={data.departmentStats}

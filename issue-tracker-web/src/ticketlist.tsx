@@ -237,7 +237,7 @@ export default function TicketList({ project }: TicketListProps) {
                       <td className="text-base-content/75">{formatDate(ticket?.createdAt)}</td>
                       <td className="text-base-content/75">{formatDate(ticket?.modifiedAt)}</td>
                       <td>{ticket.created.firstName}</td>
-                      <td>{ticket.assigned ? ticket.assigned.firstName : "None"}</td>
+                      <td>{ticket.assigned ? ticket.assigned.firstName : t('ticketList.unassigned')}</td>
                       {canDelete && (
                         <td>
                         <button className="btn btn-sm btn-error" onClick={() => handleDelete(ticket.id)}>

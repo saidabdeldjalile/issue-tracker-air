@@ -167,41 +167,41 @@ public class EmailService {
         return html.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
     }
 
-    public void sendPasswordResetEmail(String email, String firstName, String resetLink) throws MessagingException {
+    public void sendPasswordResetEmail(String email, String token) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         helper.setTo(email);
         helper.setSubject("[Air Algérie] Réinitialisation de votre mot de passe");
 
-        String content = buildPasswordResetEmail(firstName, resetLink);
+        String content = buildPasswordResetEmail(token);
         helper.setText(content, true);
 
         mailSender.send(message);
         log.info("Password reset email sent to {}", email);
     }
 
-    private String buildPasswordResetEmail(String firstName, String resetLink) {
+    private String buildPasswordResetEmail(String token) {
+        String resetLink = baseUrl + "/reset-password?token=" + token;
         return """
             <html>
             <body style='font-family: Arial, sans-serif;'>
                 <h2>🔐 Réinitialisation de mot de passe - Air Algérie</h2>
-                <p>Bonjour %s,</p>
                 <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
                 <p>Cliquez sur le lien ci-dessous pour créer un nouveau mot de passe:</p>
                 <p style='margin: 20px 0;'>
-                    <a href='%s%s' style='background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;'>
+                    <a href='%s' style='background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;'>
                         Réinitialiser mon mot de passe
                     </a>
                 </p>
-                <p>Ou copiez ce lien dans votre navigateur: %s%s</p>
+                <p>Ou copiez ce lien dans votre navigateur: %s</p>
                 <p style='color: #666; font-size: 0.9em; margin-top: 20px;'>
-                    <strong>Attention:</strong> Ce lien expire dans 30 minutes. Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.
+                    <strong>Attention:</strong> Ce lien expire dans 1 heure. Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.
                 </p>
                 <hr>
                 <p style='color: #666; font-size: 0.8em;'>Cet email a été généré automatiquement par la plateforme interne Air Algérie.</p>
             </body>
             </html>
-            """.formatted(firstName != null ? firstName : "", baseUrl, resetLink, baseUrl, resetLink);
+            """.formatted(resetLink, resetLink);
     }
 }

@@ -29,6 +29,13 @@ public class AuthController {
         
         PasswordResetService.PasswordResetResult result = passwordResetService.requestPasswordReset(email);
         
+        if (result.getResetLink() != null) {
+            return ResponseEntity.ok(Map.of(
+                    "message", result.getMessage(),
+                    "resetLink", result.getResetLink()
+            ));
+        }
+        
         return ResponseEntity.ok(Map.of("message", result.getMessage()));
     }
 
@@ -42,8 +49,8 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("message", "Token requis"));
         }
         
-        if (newPassword == null || newPassword.length() < 6) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Le mot de passe doit contenir au moins 6 caractères"));
+        if (newPassword == null || newPassword.length() < 8) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Le mot de passe doit contenir au moins 8 caractères"));
         }
         
         PasswordResetService.PasswordResetResult result = passwordResetService.resetPassword(token, newPassword);

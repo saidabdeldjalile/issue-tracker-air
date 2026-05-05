@@ -34,7 +34,7 @@ public class FAQ {
 
     @ElementCollection
     @CollectionTable(name = "faq_keywords", joinColumns = @JoinColumn(name = "faq_id"))
-    @Column(name = "keyword")
+    @Column(name = "keywords")
     private List<String> keywords;
 
     @ManyToOne(fetch = FetchType.EAGER)

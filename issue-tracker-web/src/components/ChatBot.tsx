@@ -130,7 +130,7 @@ export default function ChatBot({ onClose }: ChatBotProps) {
   const [isWsConnected, setIsWsConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { isConnected: wsConnected, connect: connectWs, send: sendWs, subscribe: subscribeWs } = useWebSocket({
+  const { isConnected: wsConnected, connect: connectWs, subscribe: subscribeWs } = useWebSocket({
     url: 'http://localhost:6969',
     onConnect: () => setIsWsConnected(true),
     onDisconnect: () => setIsWsConnected(false),

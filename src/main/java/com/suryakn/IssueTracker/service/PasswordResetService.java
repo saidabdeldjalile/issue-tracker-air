@@ -40,6 +40,7 @@ public class PasswordResetService {
     public static class PasswordResetResult {
         private boolean success;
         private String message;
+        private String resetLink;
     }
 
     @Transactional
@@ -47,7 +48,6 @@ public class PasswordResetService {
         Optional<UserEntity> userOpt = userRepository.findByEmail(email);
         
         if (userOpt.isEmpty()) {
-            // Don't reveal if email exists for security
             return PasswordResetResult.builder()
                     .success(true)
                     .message("Si l'adresse email existe, un lien de réinitialisation a été envoyé.")
@@ -56,10 +56,8 @@ public class PasswordResetService {
 
         UserEntity user = userOpt.get();
         
-        // Delete any existing unused tokens
         tokenRepository.deleteByUserAndUsedTrue(user);
         
-        // Create new token
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = PasswordResetToken.builder()
                 .token(token)
@@ -70,13 +68,17 @@ public class PasswordResetService {
         
         tokenRepository.save(resetToken);
         
-        // Send email with reset link
         try {
-            String resetLink = "/reset-password?token=" + token;
-            emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), resetLink);
+            emailService.sendPasswordResetEmail(user.getEmail(), token);
             log.info("Password reset email sent to {}", user.getEmail());
         } catch (Exception e) {
-            log.error("Failed to send password reset email: {}", e.getMessage());
+            log.warn("Email not configured, returning reset link directly for testing. Token: {}", token);
+            String resetLink = "/reset-password?token=" + token;
+            return PasswordResetResult.builder()
+                    .success(true)
+                    .message("Lien de réinitialisation généré (email non configuré)")
+                    .resetLink(resetLink)
+                    .build();
         }
         
         return PasswordResetResult.builder()
@@ -107,16 +109,13 @@ public class PasswordResetService {
         
         UserEntity user = resetToken.getUser();
         
-        // Update password
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         
-        // Mark token as used
         resetToken.setUsed(true);
         resetToken.setUsedAt(LocalDateTime.now());
         tokenRepository.save(resetToken);
         
-        // Delete other unused tokens for this user
         tokenRepository.deleteByUserAndUsedTrue(user);
         
         log.info("Password reset successful for user {}", user.getEmail());

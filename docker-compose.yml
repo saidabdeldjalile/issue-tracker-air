@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   postgres:
@@ -51,7 +51,7 @@ services:
       CLASSIFICATION_SERVICE_URL: http://ai-chatbot:5001
       CHATBOT_SERVICE_URL: http://ai-chatbot:5001
       DUPLICATE_SERVICE_URL: http://duplicate-service:5000
-      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000,http://localhost:5174,http://frontend:80}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80,http://localhost:5173,http://localhost:3000,http://localhost:5174,http://frontend:80}
       MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
       MAIL_PORT: ${MAIL_PORT:-587}
       MAIL_USERNAME: ${MAIL_USERNAME:-}
@@ -94,29 +94,29 @@ services:
       retries: 3
     restart: unless-stopped
 
-   ai-chatbot:
-     build:
-       context: ./ai-service
-       dockerfile: Dockerfile
-     container_name: ai-chatbot
-     command: python run.py
-     ports:
-       - "5001:5001"
-     environment:
-       - FLASK_ENV=production
-       - BACKEND_URL=http://backend:6969/api
-       - OLLAMA_URL=http://host.docker.internal:11434
-     volumes:
-       - ./ai-service/models:/app/models
-     networks:
-       - issue-tracker-network
-     healthcheck:
-       test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
-       interval: 30s
-       timeout: 10s
-       retries: 3
-       start_period: 60s
-     restart: unless-stopped
+  ai-chatbot:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: ai-chatbot
+    command: python run.py
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=production
+      - BACKEND_URL=http://backend:6969/api
+      - OLLAMA_URL=http://host.docker.internal:11434
+    volumes:
+      - ./ai-service/models:/app/models
+    networks:
+      - issue-tracker-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
 
 
   duplicate-service:
@@ -138,6 +138,7 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   issue-tracker-network:

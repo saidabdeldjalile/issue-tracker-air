@@ -38,5 +38,6 @@ public class CreateUserRequest {
     private Long departmentId;
 
     @Size(max = 50, message = "Registration number must not exceed 50 characters")
+    @NotBlank(message = "Registration number is required")
     private String registrationNumber;
 }

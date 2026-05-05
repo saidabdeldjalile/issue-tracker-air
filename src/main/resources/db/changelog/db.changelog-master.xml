@@ -6,7 +6,9 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!-- Include all change sets in order -->
-    <include file="001-initial-schema.xml"/>
-    <include file="002-seed-data.xml"/>
+    <include file="001-initial-schema.xml" relativeToChangelogFile="true"/>
+    <include file="002-password-reset-token.xml" relativeToChangelogFile="true"/>
+    <include file="003-comprehensive-seed.sql" relativeToChangelogFile="true"/>
+
 
 </databaseChangeLog>

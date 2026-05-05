@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${app.upload.path:uploads/screenshots}")
     private String uploadPath;
 
-    @Value("${app.cors.allowed-origins:http://localhost:5173}")
+    @Value("${app.cors.allowed-origins:http://localhost,http://localhost:80,http://localhost:5173,http://localhost:5174,http://localhost:3000,http://127.0.0.1,http://127.0.0.1:80,http://127.0.0.1:5173}")
     private String allowedOrigins;
 
     @Override

@@ -1,4 +1,5 @@
-import api from "./api/axios";
+import axios from "axios";
+import config from "./config";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -17,29 +18,29 @@ function Registrationform() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    try {
-      await api.post("/auth/register", {
-        firstName: firstName,
-        lastName: lastName,
-        password: password,
-        email: email,
-        role: "ADMIN",
-        registrationNumber: registrationNumber || null,
-      });
-      toast.success(t('common.message.success'));
-      setTimeout(() => {
-        navigate("/login", { replace: true });
-      }, 1500);
-    } catch (error) {
-      toast.error(t('common.errors.generic'));
-    } finally {
-      setLoading(false);
-    }
-  };
+   const handleSubmit = async (e: any) => {
+     e.preventDefault();
+     setLoading(true);
+     
+      try {
+        await axios.post(`${config.authUrl}/register`, {
+          firstName: firstName,
+          lastName: lastName,
+          password: password,
+          email: email,
+          role: "USER",
+          registrationNumber: registrationNumber,
+        });
+       toast.success(t('common.message.success'));
+       setTimeout(() => {
+         navigate("/login", { replace: true });
+       }, 1500);
+     } catch (error) {
+       toast.error(t('common.errors.generic'));
+     } finally {
+       setLoading(false);
+     }
+   };
 
   const passwordStrength = () => {
     if (password.length === 0) return 0;
@@ -178,21 +179,22 @@ function Registrationform() {
                   </div>
                 </div>
 
-                {/* Matricule Field */}
-                <div className="relative">
-                  <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${focusedField === 'matricule' || registrationNumber ? 'text-red-600' : 'text-gray-400'}`}>
-                    <Briefcase className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Matricule (optionnel)"
-                    className="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 focus:border-red-600 focus:ring-2 focus:ring-red-600/10 transition-all"
-                    value={registrationNumber}
-                    onFocus={() => setFocusedField('matricule')}
-                    onBlur={() => setFocusedField(null)}
-                    onChange={(e) => setRegistrationNumber(e.target.value)}
-                  />
-                </div>
+                 {/* Matricule Field */}
+                 <div className="relative">
+                   <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${focusedField === 'matricule' || registrationNumber ? 'text-red-600' : 'text-gray-400'}`}>
+                     <Briefcase className="w-4 h-4" />
+                   </div>
+                   <input
+                     type="text"
+                     placeholder="Matricule"
+                     className="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 focus:border-red-600 focus:ring-2 focus:ring-red-600/10 transition-all"
+                     value={registrationNumber}
+                     onFocus={() => setFocusedField('matricule')}
+                     onBlur={() => setFocusedField(null)}
+                     onChange={(e) => setRegistrationNumber(e.target.value)}
+                     required
+                   />
+                 </div>
 
                 {/* Email Field */}
                 <div className="relative">

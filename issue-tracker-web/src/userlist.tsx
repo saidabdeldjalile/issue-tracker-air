@@ -341,16 +341,17 @@ export default function UserList() {
 
           <form onSubmit={handleSubmit} className="p-6">
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="form-control">
-                <label className="label-text font-bold mb-1">Matricule</label>
-                <input
-                  type="text"
-                  value={formData.registrationNumber}
-                  onChange={(e) => setFormData({ ...formData, registrationNumber: e.target.value })}
-                  className="input input-bordered w-full"
-                  placeholder="Ex: EMP-001"
-                />
-              </div>
+                <div className="form-control">
+                  <label className="label-text font-bold mb-1">Matricule</label>
+                  <input
+                    type="text"
+                    value={formData.registrationNumber}
+                    onChange={(e) => setFormData({ ...formData, registrationNumber: e.target.value })}
+                    className="input input-bordered w-full"
+                    placeholder="Ex: EMP-001"
+                    required
+                  />
+                </div>
 
               <div className="form-control">
                 <label className="label-text font-bold mb-1">Rôle</label>

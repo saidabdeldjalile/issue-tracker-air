@@ -726,6 +726,48 @@ def chat():
         return jsonify({"response": f"Erreur interne : {str(e)}", "need_feedback": False}), 500
 
 
+@app.route("/classify", methods=["POST"])
+def classify():
+    """
+    Endpoint for backend to classify tickets automatically.
+    Unifies the classification service with the AI service.
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+            
+        title = data.get("title", "")
+        text = data.get("text", "")
+        full_text = f"{title} {text}"
+        
+        # Use existing logic from ai-service
+        category = classify_demand(full_text)
+        priority = classify_priority(full_text)
+        
+        # Map detected categories to actual departments (based on seed data)
+        # 1: DSI, 2: DRH, 3: OPS, 4: MAINTENANCE, 5: GFC
+        dept_map = {
+            "IT": "DSI",
+            "RH": "DRH",
+            "Matériel": "DSI",
+            "Maintenance": "MAINTENANCE",
+            "Formation": "DRH",
+            "Autres": "DSI"
+        }
+        
+        return jsonify({
+            "category": category,
+            "suggestedDepartment": dept_map.get(category, "DSI"),
+            "suggestedPriority": priority,
+            "confidence": 0.90,
+            "keywords": []
+        })
+    except Exception as e:
+        logger.error(f"Classification error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/chat/feedback", methods=["POST"])
 def chat_feedback():
     """Store user feedback about chatbot responses."""

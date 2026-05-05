@@ -10,7 +10,7 @@
     <!-- ==================== DEPARTMENT ==================== -->
     <changeSet id="001-create-department" author="liquibase">
         <createTable tableName="department">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(255)">
@@ -23,7 +23,7 @@
     <!-- ==================== USER (_user) ==================== -->
     <changeSet id="002-create-user" author="liquibase">
         <createTable tableName="_user">
-            <column name="id" type="INTEGER">
+            <column name="id" type="INTEGER" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="first_name" type="VARCHAR(100)"/>
@@ -48,7 +48,7 @@
     <!-- ==================== PROJECT ==================== -->
     <changeSet id="003-create-project" author="liquibase">
         <createTable tableName="project">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(255)">
@@ -70,7 +70,7 @@
     <!-- ==================== TICKET ==================== -->
     <changeSet id="004-create-ticket" author="liquibase">
         <createTable tableName="ticket">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="title" type="VARCHAR(500)">
@@ -120,7 +120,7 @@
     <!-- ==================== COMMENT ==================== -->
     <changeSet id="005-create-comment" author="liquibase">
         <createTable tableName="comment">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="comment" type="TEXT">
@@ -153,7 +153,7 @@
     <!-- ==================== SCREENSHOT ==================== -->
     <changeSet id="006-create-screenshot" author="liquibase">
         <createTable tableName="screenshot">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="image_url" type="VARCHAR(500)">
@@ -191,7 +191,7 @@
     <!-- ==================== COMMENT_SCREENSHOT ==================== -->
     <changeSet id="007-create-commentscreenshot" author="liquibase">
         <createTable tableName="commentscreenshot">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="image_url" type="VARCHAR(500)">
@@ -229,7 +229,7 @@
     <!-- ==================== NOTIFICATION ==================== -->
     <changeSet id="008-create-notification" author="liquibase">
         <createTable tableName="notification">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="type" type="VARCHAR(50)"/>
@@ -264,7 +264,7 @@
     <!-- ==================== FAQ ==================== -->
     <changeSet id="009-create-faq" author="liquibase">
         <createTable tableName="faq">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="question" type="VARCHAR(1000)">
@@ -318,7 +318,7 @@
     <!-- ==================== UNANSWERED_QUESTION ==================== -->
     <changeSet id="011-create-unanswered-question" author="liquibase">
         <createTable tableName="unanswered_question">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="question" type="TEXT">
@@ -341,7 +341,7 @@
     <!-- ==================== PROCEDURE ==================== -->
     <changeSet id="012-create-procedure" author="liquibase">
         <createTable tableName="procedure">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="title" type="VARCHAR(255)">
@@ -372,7 +372,7 @@
     <!-- ==================== VECTOR_TABLE ==================== -->
     <changeSet id="013-create-vector-table" author="liquibase">
         <createTable tableName="vector_table">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="ticket_id" type="BIGINT"/>

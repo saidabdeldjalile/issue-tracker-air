@@ -248,34 +248,34 @@ def process_question_with_context(message, db_context, user_email):
             response += f"  - Total des utilisateurs: {stats.get('totalUsers', 0)}\n"
             return response.strip()
 
-      # Questions about user's own tickets/notifications
-      if 'mes' in message_lower or 'mon' in message_lower or 'ma' in message_lower:
-          if 'currentUser' in db_context:
-              user_info = db_context['currentUser']
-              response = f"Bonjour {user_info.get('firstName', '')} {user_info.get('lastName', '')},\n\n"
+    # Questions about user's own tickets/notifications
+    if 'mes' in message_lower or 'mon' in message_lower or 'ma' in message_lower:
+        if 'currentUser' in db_context:
+            user_info = db_context['currentUser']
+            response = f"Bonjour {user_info.get('firstName', '')} {user_info.get('lastName', '')},\n\n"
 
-              if 'userTicketCount' in db_context:
-                  response += f"Vous avez {db_context['userTicketCount']} ticket(s) créé(s).\n"
+            if 'userTicketCount' in db_context:
+                response += f"Vous avez {db_context['userTicketCount']} ticket(s) créé(s).\n"
 
-              if 'unreadNotificationsCount' in db_context:
-                  count = db_context['unreadNotificationsCount']
-                  if count > 0:
-                      response += f"Vous avez {count} notification(s) non lue(s).\n"
+            if 'unreadNotificationsCount' in db_context:
+                count = db_context['unreadNotificationsCount']
+                if count > 0:
+                    response += f"Vous avez {count} notification(s) non lue(s).\n"
 
-              if 'userRecentTickets' in db_context and db_context['userRecentTickets']:
-                  response += "\nVos tickets récents:\n"
-                  for t in db_context['userRecentTickets'][:5]:
-                      response += f"  - #{t.get('id')}: {t.get('title')} ({t.get('status')})\n"
+            if 'userRecentTickets' in db_context and db_context['userRecentTickets']:
+                response += "\nVos tickets récents:\n"
+                for t in db_context['userRecentTickets'][:5]:
+                    response += f"  - #{t.get('id')}: {t.get('title')} ({t.get('status')})\n"
 
-              return response.strip()
+            return response.strip()
 
-      # Default response
-      return "Je peux vous aider avec:\n" \
-             "- Les tickets (nombre, statut, priorité)\n" \
-             "- Les projets et départements\n" \
-             "- Les statistiques et le tableau de bord\n" \
-             "- Vos tickets et notifications personnels\n\n" \
-             "Choisissez une option parmi celles ci-dessus pour obtenir des informations précises."
+    # Default response
+    return "Je peux vous aider avec:\n" \
+           "- Les tickets (nombre, statut, priorité)\n" \
+           "- Les projets et départements\n" \
+           "- Les statistiques et le tableau de bord\n" \
+           "- Vos tickets et notifications personnels\n\n" \
+           "Choisissez une option parmi celles ci-dessus pour obtenir des informations précises."
 
 def detect_intent(message):
     """Simple intent detection."""

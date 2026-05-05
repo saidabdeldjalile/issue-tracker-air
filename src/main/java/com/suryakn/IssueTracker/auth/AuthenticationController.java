@@ -3,7 +3,9 @@ package com.suryakn.IssueTracker.auth;
 import com.suryakn.IssueTracker.auth.dtos.AuthenticateRequest;
 import com.suryakn.IssueTracker.auth.dtos.AuthenticationResponse;
 import com.suryakn.IssueTracker.auth.dtos.RegisterRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -24,7 +27,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request
+            @Valid @RequestBody RegisterRequest request
     ) {
         return ResponseEntity.ok(service.register(request));
     }
@@ -33,6 +36,9 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticateRequest request
     ) {
+        log.info("Login attempt for email: {}, password length: {}", 
+            request.getEmail(), 
+            request.getPassword() != null ? request.getPassword().length() : "null");
         return ResponseEntity.ok(service.authenticate(request));
     }
 

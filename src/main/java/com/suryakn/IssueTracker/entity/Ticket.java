@@ -32,7 +32,12 @@ public class Ticket {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+    @Column(columnDefinition = "VARCHAR(50)")
+    @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Column(columnDefinition = "VARCHAR(50)")
+    @Enumerated(EnumType.STRING)
     private Priority priority;
     private String category;
     @Column(columnDefinition = "TEXT")

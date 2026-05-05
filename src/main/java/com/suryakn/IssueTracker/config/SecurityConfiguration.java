@@ -49,6 +49,9 @@ public class SecurityConfiguration {
                 
                 // Configuration des autorisations
                 .authorizeHttpRequests(authorize -> authorize
+                        // Allow CORS preflight requests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        
                         // Endpoints publics d'authentification
                         .requestMatchers("/api/auth/**").permitAll()
                         
@@ -58,6 +61,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/public/**").permitAll()
                         .requestMatchers("/api/screenshots/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        
+                        // Health check endpoint (public for monitoring)
+                        .requestMatchers("/health").permitAll()
                         
                         // Notification endpoints (SSE doesn't support auth headers)
                         .requestMatchers("/api/v1/notifications/health").permitAll()
@@ -112,59 +118,54 @@ public class SecurityConfiguration {
     /**
      * Configuration CORS pour autoriser les requêtes depuis le frontend
      */
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        return new CorsConfigurationSource() {
-            @Override
-            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                CorsConfiguration config = new CorsConfiguration();
-                
-                // Origines autorisées (frontend)
-                config.setAllowedOrigins(Arrays.asList(
-                    "http://localhost:5173", 
-                    "http://localhost:5174", 
-                    "http://localhost:3000",
-                    "http://127.0.0.1:5173",
-                    "http://127.0.0.1:5174",
-                    "http://127.0.0.1:3000",
-                    "http://localhost:5000",
-                    "http://localhost:5001"
-                ));
-                
-                // Méthodes HTTP autorisées
-                config.setAllowedMethods(Arrays.asList(
-                    "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
-                ));
-                
-                // Headers autorisés
-                config.setAllowedHeaders(Arrays.asList(
-                    "Content-Type", 
-                    "Authorization", 
-                    "Accept", 
-                    "Cache-Control", 
-                    "X-Requested-With", 
-                    "Origin",
-                    "Access-Control-Request-Method",
-                    "Access-Control-Request-Headers",
-                    "multipart/form-data"
-                ));
-                
-                // Headers exposés (peuvent être lus par le navigateur)
-                config.setExposedHeaders(Arrays.asList(
-                    "Authorization", 
-                    "Content-Disposition",
-                    "X-Total-Count",
-                    "X-Page-Count"
-                ));
-                
-                // Autoriser l'envoi de cookies/credentials
-                config.setAllowCredentials(true);
-                
-                // Durée de cache des préflight (en secondes)
-                config.setMaxAge(3600L);
-                
-                return config;
-            }
-        };
-    }
+     @Bean
+     public CorsConfigurationSource corsConfigurationSource() {
+         return new CorsConfigurationSource() {
+             @Override
+             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                 CorsConfiguration config = new CorsConfiguration();
+                 
+                 // Allow all origins for development (permissive)
+                 config.setAllowedOriginPatterns(Arrays.asList(
+                     "http://localhost",
+                     "http://localhost:*",
+                     "http://127.0.0.1",
+                     "http://127.0.0.1:*"
+                 ));
+                 
+                 // Méthodes HTTP autorisées
+                 config.setAllowedMethods(Arrays.asList(
+                     "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+                 ));
+                 
+                 // Headers autorisés
+                 config.setAllowedHeaders(Arrays.asList(
+                     "Content-Type", 
+                     "Authorization", 
+                     "Accept", 
+                     "Cache-Control", 
+                     "X-Requested-With", 
+                     "Origin",
+                     "Access-Control-Request-Method",
+                     "Access-Control-Request-Headers"
+                 ));
+                 
+                 // Headers exposés
+                 config.setExposedHeaders(Arrays.asList(
+                     "Authorization", 
+                     "Content-Disposition",
+                     "X-Total-Count",
+                     "X-Page-Count"
+                 ));
+                 
+                 // Autoriser l'envoi de cookies/credentials
+                 config.setAllowCredentials(true);
+                 
+                 // Durée de cache des préflight
+                 config.setMaxAge(3600L);
+                 
+                 return config;
+             }
+         };
+     }
 }

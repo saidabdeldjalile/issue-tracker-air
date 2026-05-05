@@ -142,15 +142,18 @@ export default function GanttChart({ projectId, departmentId }: GanttChartProps)
   }
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">{t("gantt.title")}</h2>
-        <div className="join">
+    <div className="w-full">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <h2 className="text-xl font-bold text-base-content flex items-center gap-3">
+          <svg className="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          {t("gantt.title")}
+        </h2>
+        <div className="bg-base-100/60 backdrop-blur-md p-1.5 rounded-2xl border border-base-300/50 flex gap-1 shadow-sm w-max">
           {(["Day", "Week", "Month"] as const).map((mode) => (
             <button
               key={mode}
               type="button"
-              className={`btn btn-sm join-item ${viewMode === mode ? "btn-primary" : "btn-outline"}`}
+              className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 ${viewMode === mode ? "bg-base-100 shadow-md text-secondary" : "text-base-content/60 hover:bg-base-200/50 hover:text-base-content"}`}
               onClick={() => setViewMode(mode)}
             >
               {mode}
@@ -159,8 +162,11 @@ export default function GanttChart({ projectId, departmentId }: GanttChartProps)
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <div ref={containerRef} className="gantt-container"></div>
+      <div className="overflow-hidden rounded-2xl border border-base-300/60 bg-base-100/40 backdrop-blur-xl shadow-sm relative">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="overflow-x-auto p-4 z-10 relative">
+          <div ref={containerRef} className="gantt-container min-h-[400px]"></div>
+        </div>
       </div>
 
       <style>{`
@@ -168,11 +174,17 @@ export default function GanttChart({ projectId, departmentId }: GanttChartProps)
           min-height: 400px;
           overflow-x: auto;
         }
-        .bar-blue { fill: #3b82f6; }
-        .bar-yellow { fill: #eab308; }
-        .bar-green { fill: #22c55e; }
-        .bar-gray { fill: #6b7280; }
-        .bar-orange { fill: #f97316; }
+        .gantt .grid-header { fill: transparent !important; stroke: var(--fallback-bc,oklch(var(--bc)/0.1)) !important; }
+        .gantt .grid-row { fill: transparent !important; stroke: var(--fallback-bc,oklch(var(--bc)/0.05)) !important; }
+        .gantt .tick { stroke: var(--fallback-bc,oklch(var(--bc)/0.1)) !important; }
+        .gantt .lower-text, .gantt .upper-text { fill: var(--fallback-bc,oklch(var(--bc)/0.7)) !important; font-size: 11px !important; font-weight: 600; }
+        .bar-blue { fill: #3b82f6; stroke: #2563eb; stroke-width: 1px; }
+        .bar-yellow { fill: #eab308; stroke: #ca8a04; stroke-width: 1px; }
+        .bar-green { fill: #22c55e; stroke: #16a34a; stroke-width: 1px; }
+        .bar-gray { fill: #6b7280; stroke: #4b5563; stroke-width: 1px; }
+        .bar-orange { fill: #f97316; stroke: #ea580c; stroke-width: 1px; }
+        .gantt .bar-wrapper:hover .bar { fill-opacity: 0.8; }
+        .gantt .bar-progress { fill: rgba(255,255,255,0.3) !important; }
       `}</style>
     </div>
   );

@@ -41,7 +41,13 @@ export default function AllTickets() {
   const [viewMode] = useState<ViewMode>("table");
   const [selectedTickets, setSelectedTickets] = useState<Set<number>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, _setFilters] = useState<AdvancedFilters>({
+  const [filters, setFilters] = useState<AdvancedFilters>({
+    statuses: [],
+    priorities: [],
+    startDate: "",
+    endDate: "",
+  });
+  const [tempFilters, setTempFilters] = useState<AdvancedFilters>({
     statuses: [],
     priorities: [],
     startDate: "",
@@ -66,11 +72,11 @@ export default function AllTickets() {
       }
 
       if (filters.statuses.length > 0) {
-        params.status = filters.statuses;
+        params.status = filters.statuses.join(',');
       }
 
       if (filters.priorities.length > 0) {
-        params.priority = filters.priorities;
+        params.priority = filters.priorities.join(',');
       }
 
       if (filters.startDate) {
@@ -89,7 +95,7 @@ export default function AllTickets() {
         params.endDate = `${year}-${month}-${day} 23:59:59`;
       }
 
-      const response = await api.get("/tickets/advanced-search", { params });
+      const response = await api.get("/tickets/search", { params });
       return response.data as PaginatedTickets;
     }
 
@@ -304,7 +310,17 @@ export default function AllTickets() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="form-control">
               <label className="label-text font-bold mb-2">{t('filters.status')}</label>
-              <select className="select select-bordered select-sm">
+              <select
+                className="select select-bordered select-sm"
+                value={tempFilters.statuses.length === 1 ? tempFilters.statuses[0] : ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setTempFilters(prev => ({
+                    ...prev,
+                    statuses: value ? [value as TicketStatus] : []
+                  }));
+                }}
+              >
                 <option value="">{t('common.all')}</option>
                 <option value="Open">{t('status.open')}</option>
                 <option value="InProgress">{t('status.inProgress')}</option>
@@ -314,7 +330,17 @@ export default function AllTickets() {
             </div>
             <div className="form-control">
               <label className="label-text font-bold mb-2">{t('filters.priority')}</label>
-              <select className="select select-bordered select-sm">
+              <select
+                className="select select-bordered select-sm"
+                value={tempFilters.priorities.length === 1 ? tempFilters.priorities[0] : ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setTempFilters(prev => ({
+                    ...prev,
+                    priorities: value ? [value as TicketPriority] : []
+                  }));
+                }}
+              >
                 <option value="">{t('common.all')}</option>
                 <option value="Critical">{t('priority.critical')}</option>
                 <option value="High">{t('priority.high')}</option>
@@ -324,16 +350,53 @@ export default function AllTickets() {
             </div>
             <div className="form-control">
               <label className="label-text font-bold mb-2">{t('filters.startDate')}</label>
-              <input type="date" className="input input-bordered input-sm" />
+              <input
+                type="date"
+                className="input input-bordered input-sm"
+                value={tempFilters.startDate}
+                onChange={(e) => setTempFilters(prev => ({ ...prev, startDate: e.target.value }))}
+              />
             </div>
             <div className="form-control">
               <label className="label-text font-bold mb-2">{t('filters.endDate')}</label>
-              <input type="date" className="input input-bordered input-sm" />
+              <input
+                type="date"
+                className="input input-bordered input-sm"
+                value={tempFilters.endDate}
+                onChange={(e) => setTempFilters(prev => ({ ...prev, endDate: e.target.value }))}
+              />
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-4">
-            <button className="btn btn-ghost btn-sm">{t('common.reset')}</button>
-            <button className="btn btn-primary btn-sm">{t('common.apply')}</button>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => {
+                setTempFilters({
+                  statuses: [],
+                  priorities: [],
+                  startDate: '',
+                  endDate: '',
+                });
+                setFilters({
+                  statuses: [],
+                  priorities: [],
+                  startDate: '',
+                  endDate: '',
+                });
+                setPage(0);
+              }}
+            >
+              {t('common.reset')}
+            </button>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => {
+                setFilters(tempFilters);
+                setPage(0);
+              }}
+            >
+              {t('common.apply')}
+            </button>
           </div>
         </div>
       )}

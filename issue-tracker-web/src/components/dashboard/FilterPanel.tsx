@@ -67,92 +67,110 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   };
 
   return (
-    <div className="bg-base-100 rounded-lg shadow-sm border border-base-200 p-4">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-4 items-center flex-1">
-          <div className="form-control">
-            <label className="label text-sm text-base-content/70">
+    <div className="bg-base-100/80 backdrop-blur-xl rounded-2xl shadow-sm border border-base-300/60 p-5 mb-8">
+      <div className="flex flex-col lg:flex-row gap-5 items-end justify-between">
+        <div className="flex flex-col sm:flex-row gap-5 items-center flex-1 w-full lg:w-auto">
+          <div className="form-control w-full sm:w-auto">
+            <label className="label text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-1 px-1 py-0">
               Start Date
             </label>
-            <input
-              type="date"
-              value={filters.startDate}
-              onChange={(e) => handleDateChange('startDate', e.target.value)}
-              className="input input-bordered input-sm w-full max-w-xs"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-base-content/40">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              </div>
+              <input
+                type="date"
+                value={filters.startDate}
+                onChange={(e) => handleDateChange('startDate', e.target.value)}
+                className="input input-bordered h-11 pl-10 bg-base-100 focus:bg-base-100/50 transition-colors w-full sm:w-[150px]"
+              />
+            </div>
           </div>
           
-          <div className="form-control">
-            <label className="label text-sm text-base-content/70">
+          <div className="form-control w-full sm:w-auto">
+            <label className="label text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-1 px-1 py-0">
               End Date
             </label>
-            <input
-              type="date"
-              value={filters.endDate}
-              onChange={(e) => handleDateChange('endDate', e.target.value)}
-              className="input input-bordered input-sm w-full max-w-xs"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-base-content/40">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              </div>
+              <input
+                type="date"
+                value={filters.endDate}
+                onChange={(e) => handleDateChange('endDate', e.target.value)}
+                className="input input-bordered h-11 pl-10 bg-base-100 focus:bg-base-100/50 transition-colors w-full sm:w-[150px]"
+              />
+            </div>
           </div>
 
-          <div className="form-control">
-            <label className="label text-sm text-base-content/70">
+          <div className="form-control w-full sm:w-auto flex-1 max-w-xs">
+            <label className="label text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-1 px-1 py-0">
               Department
             </label>
-<select
-              value={filters.departmentId || ''}
-              onChange={(e) => handleDepartmentChange(e.target.value)}
-              className="select select-bordered select-sm w-full max-w-xs"
-              disabled={loading}
-            >
-              <option value="">All Departments</option>
-              {loading ? (
-                <option disabled>Loading...</option>
-              ) : (
-                departments.map((dept) => (
-                  <option key={dept.id} value={dept.id.toString()}>
-                    {dept.name}
-                  </option>
-                ))
-              )}
-            </select>
-
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-base-content/40 z-10">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+              </div>
+              <select
+                value={filters.departmentId || ''}
+                onChange={(e) => handleDepartmentChange(e.target.value)}
+                className="select select-bordered h-11 pl-10 bg-base-100 focus:bg-base-100/50 transition-colors w-full"
+                disabled={loading}
+              >
+                <option value="">All Departments</option>
+                {loading ? (
+                  <option disabled>Loading...</option>
+                ) : (
+                  departments.map((dept) => (
+                    <option key={dept.id} value={dept.id.toString()}>
+                      {dept.name}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
           </div>
 
-          <div className="form-control">
-            <label className="label text-sm text-base-content/70">
+          <div className="form-control w-full sm:w-auto flex-1 max-w-xs">
+            <label className="label text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-1 px-1 py-0">
               Project
             </label>
-<select
-              value={filters.projectId || ''}
-              onChange={(e) => handleProjectChange(e.target.value)}
-              className="select select-bordered select-sm w-full max-w-xs"
-              disabled={loading}
-            >
-              <option value="">All Projects</option>
-              {loading ? (
-                <option disabled>Loading...</option>
-              ) : (
-                projects.map((proj) => (
-                  <option key={proj.id} value={proj.id.toString()}>
-                    {proj.name}
-                  </option>
-                ))
-              )}
-            </select>
-
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-base-content/40 z-10">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+              </div>
+              <select
+                value={filters.projectId || ''}
+                onChange={(e) => handleProjectChange(e.target.value)}
+                className="select select-bordered h-11 pl-10 bg-base-100 focus:bg-base-100/50 transition-colors w-full"
+                disabled={loading}
+              >
+                <option value="">All Projects</option>
+                {loading ? (
+                  <option disabled>Loading...</option>
+                ) : (
+                  projects.map((proj) => (
+                    <option key={proj.id} value={proj.id.toString()}>
+                      {proj.name}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-3 w-full lg:w-auto">
           <button
             onClick={onReset}
-            className="btn btn-sm btn-outline"
+            className="btn h-11 btn-ghost border border-base-300 hover:bg-base-200 flex-1 lg:flex-none"
           >
-            Reset Filters
+            Reset
           </button>
           <button
             onClick={() => onFilterChange(filters)}
-            className="btn btn-sm btn-primary"
+            className="btn h-11 btn-primary shadow-lg shadow-primary/30 hover:shadow-primary/50 flex-1 lg:flex-none transition-all"
           >
             Apply Filters
           </button>

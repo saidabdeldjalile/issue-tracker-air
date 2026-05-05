@@ -3,6 +3,8 @@ import {  Route, Routes } from "react-router-dom";
 import Layout from "./layout";
 
 import Loginform from "./loginform";
+import ForgotPassword from "./forgotpassword";
+import ResetPassword from "./resetpassword";
 import ProjectList from "./projectlist";
 import DepartmentList from "./departmentlist";
 import Registrationform from "./registrationform";
@@ -50,12 +52,14 @@ export default function App() {
 
         // transition: Bounce,
       />
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          {/* <Route index element={<Navigate to="/projects" replace />} /> */}
-          <Route index element={<Home/>} />
-          <Route path="/register" element={<Registrationform />} />
-          <Route path="/login" element={<Loginform />} />
+<Routes>
+         <Route path="/" element={<Layout />}>
+           {/* <Route index element={<Navigate to="/projects" replace />} /> */}
+           <Route index element={<Home/>} />
+           <Route path="/register" element={<Registrationform />} />
+           <Route path="/login" element={<Loginform />} />
+           <Route path="/forgot-password" element={<ForgotPassword />} />
+           <Route path="/reset-password" element={<ResetPassword />} />
           <Route element={<RequireAuth />}>
             <Route path="/projects" element={<ProjectList />} />
             <Route path="/projects/:pid/tickets" element={<Testing />} />

@@ -35,7 +35,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired/invalid - clear auth only if we were previously logged in
       const hadToken = !!localStorage.getItem("token");
-      if (hadToken) {
+      if (hadToken && window.location.pathname !== "/login") {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         window.location.href = "/login";

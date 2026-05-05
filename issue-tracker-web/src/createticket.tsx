@@ -273,7 +273,6 @@ export default function CreateTicketBody({ refreshKey }: { refreshKey: number })
         </div>
         <select
           name="project"
-          key={newIssue.project}
           value={newIssue.project}
           onChange={(e) => handleChange(e)}
           className="select select-bordered"
@@ -307,7 +306,6 @@ export default function CreateTicketBody({ refreshKey }: { refreshKey: number })
           </div>
           <select
             name="issueType"
-            key={newIssue.issueType}
             value={newIssue.issueType}
             onChange={(e) => handleChange(e)}
             className="select select-bordered"
@@ -328,7 +326,6 @@ export default function CreateTicketBody({ refreshKey }: { refreshKey: number })
           </div>
             <select
                 name="status"
-                key={newIssue.status}
                 value={newIssue.status}
                 onChange={(e) => handleChange(e)}
                 className="select select-bordered"
@@ -350,7 +347,6 @@ export default function CreateTicketBody({ refreshKey }: { refreshKey: number })
           </div>
           <select
             name="priority"
-            key={newIssue.priority}
             value={newIssue.priority}
             onChange={(e) => handleChange(e)}
             className="select select-bordered"
@@ -370,7 +366,6 @@ export default function CreateTicketBody({ refreshKey }: { refreshKey: number })
           </div>
           <select
             name="category"
-            key={newIssue.category}
             value={newIssue.category}
             onChange={(e) => handleChange(e)}
             className="select select-bordered"
@@ -486,7 +481,6 @@ export default function CreateTicketBody({ refreshKey }: { refreshKey: number })
           </div>
           <select
             value={newIssue.assignee}
-            key={newIssue.assignee}
             className="select select-bordered"
             name="assignee"
             onChange={(e) => handleChange(e)}
@@ -508,7 +502,6 @@ export default function CreateTicketBody({ refreshKey }: { refreshKey: number })
           </div>
           <select
             value={newIssue.reporter}
-            key={auth?.email}
             name="reporter"
             className="select select-bordered"
             onChange={(e) => handleChange(e)}
